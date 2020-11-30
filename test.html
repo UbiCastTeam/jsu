@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+
+	<title>JSU test page</title>
+
+	<script type="text/javascript" src="jsu.js"></script>
+
+	<script type="text/javascript">
+		function testTranslation() {
+			var expected = 'test trad';
+			jsu.addTranslations({'test label': expected});
+			alert(
+				'Current lang: ' + jsu.getCurrentLang() + '\n' +
+				jsu.translate('test label') + '\n' +
+				'Test: ' + (jsu.translate('test label') == expected ? 'OK' : 'FAIL')
+			);
+		}
+
+		function testUserAgent() {
+			// trigger internal user agent change
+			var ua = document.getElementById('userAgent').value;
+			if (ua) {
+				jsu.userAgent = ua.toLowerCase();
+				jsu._getBrowserInfo();
+			}
+			alert(
+				'jsu.userAgent: ' + jsu.userAgent + '\n' +
+				'jsu.osName: ' + jsu.osName + '\n' +
+				'jsu.osVersion: ' + jsu.osVersion + '\n' +
+				'jsu.browserName: ' + jsu.browserName + '\n' +
+				'jsu.browserVersion: ' + jsu.browserVersion + '\n' +
+				'jsu.browserVersion (type): ' + (typeof jsu.browserVersion) + '\n' +
+				'jsu.isMobile: ' + jsu.isMobile + '\n' +
+				'jsu.isTactile: ' + jsu.isTactile
+			);
+			return false;
+		}
+
+		function testWebGL() {
+			alert('jsu.getWebglContext: ' + jsu.getWebglContext());
+		}
+	</script>
+</head>
+
+<body>
+	<p>
+		<button type="button" onclick="testTranslation();">Test translations</button>
+	</p>
+	<p>
+		<button type="button" onclick="testUserAgent();">Test user agent</button>
+		<input type="text" name="userAgent" id="userAgent" style="width: 90%" placeholder="User agent to test (local user agent if empty)"/>
+	</p>
+	<p>
+		<button type="button" onclick="testWebGL();">Test webgl</button>
+	</p>
+</body>
