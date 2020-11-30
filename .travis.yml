@@ -4,4 +4,4 @@ node_js:
 
 script:
   - npm install eslint
-  - eslint jsu.js
+  - eslint .

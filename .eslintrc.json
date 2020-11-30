@@ -1,5 +1,6 @@
 {
     "extends": "eslint:recommended",
+    "ignorePatterns": ["vendors/*"],
     "rules": {
         "indent": ["error", 4, {"SwitchCase": 1, "ArrayExpression": "first", "ObjectExpression": "first"}],
         "no-trailing-spaces": "error",
