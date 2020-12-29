@@ -187,6 +187,18 @@ if (shouldBeDefined('getClickPosition')) {
     };
 }
 
+if (shouldBeDefined('onDOMLoad')) {
+    jsu.onDOMLoad = function (callback) {
+        // see if DOM is already available
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            // call on next available tick
+            setTimeout(callback, 1);
+        } else {
+            document.addEventListener('DOMContentLoaded', callback);
+        }
+    };
+}
+
 if (shouldBeDefined('compareVersions')) {
     jsu.compareVersions = function (v1, comparator, v2) {
         // Function to compare versions like "4.5.6"
