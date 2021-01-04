@@ -199,6 +199,71 @@ if (shouldBeDefined('onDOMLoad')) {
     };
 }
 
+if (shouldBeDefined('httpRequest')) {
+    jsu.httpRequest = function (args) {
+        const params = args.params ? args.params : {};
+        if (args.cache === undefined || args.cache) {
+            params._ = (new Date()).getTime();
+        }
+        let url = args.url;
+        const urlParams = [];
+        let field;
+        for (field in params) {
+            urlParams.push(encodeURIComponent(field) + '=' + encodeURIComponent(params[field]));
+        }
+        if (urlParams.length > 0) {
+            url += '?' + urlParams.join('&');
+        }
+        let formData;
+        if (args.data instanceof FormData) {
+            formData = args.data;
+        } else if (args.data) {
+            formData = new FormData();
+            for (field in args.data) {
+                formData.append(field, args.data[field]);
+            }
+        } else {
+            formData = null;
+        }
+        const req = new XMLHttpRequest();
+        if (args.progress && req.upload) {
+            req.upload.addEventListener('progress', args.progress, false);
+        }
+        if (args.callback) {
+            req.onreadystatechange = function () {
+                if (this.readyState !== XMLHttpRequest.DONE) {
+                    return;
+                }
+                let response;
+                if (args.json) {
+                    if (this.responseText === '') {
+                        response = {
+                            error: 'No response.',
+                            empty: true,
+                            raw: this.responseText
+                        };
+                    } else {
+                        try {
+                            response = JSON.parse(this.responseText);
+                        } catch (e) {
+                            response = {
+                                error: 'Failed to parse json response: ' + e,
+                                raw: this.responseText
+                            };
+                        }
+                    }
+                } else {
+                    response = this.responseText;
+                }
+                args.callback(this, response);
+            };
+        }
+        req.open(args.method ? args.method : 'GET', url, true);
+        req.send(formData);
+        return req;
+    };
+}
+
 if (shouldBeDefined('compareVersions')) {
     jsu.compareVersions = function (v1, comparator, v2) {
         // Function to compare versions like "4.5.6"

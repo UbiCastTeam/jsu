@@ -9,8 +9,24 @@
 	<script type="text/javascript" src="jsu.js"></script>
 
 	<script type="text/javascript">
+		function objectRepr(obj) {
+			let repr = '';
+			if (typeof obj == 'string') {
+				repr = '\n  ' + obj
+			} else {
+				for (let field in obj) {
+					repr += '\n  ' + field + ': ' + obj[field];
+				}
+			}
+			if (!repr) {
+				repr = '\nempty object'
+			}
+			repr = '[' + (typeof obj) + ':' + repr + '\n]';
+			return repr;
+		}
+
 		function testTranslation() {
-			var expected = 'test trad';
+			const expected = 'test trad';
 			jsu.addTranslations({'test label': expected});
 			alert(
 				'Current lang: ' + jsu.getCurrentLang() + '\n' +
@@ -21,7 +37,7 @@
 
 		function testUserAgent() {
 			// trigger internal user agent change
-			var ua = document.getElementById('userAgent').value;
+			const ua = document.getElementById('userAgent').value;
 			if (ua) {
 				jsu.userAgent = ua.toLowerCase();
 				jsu._getBrowserInfo();
@@ -42,6 +58,20 @@
 		function testWebGL() {
 			alert('jsu.getWebglContext: ' + jsu.getWebglContext());
 		}
+
+		function testRequest(url, json) {
+			jsu.httpRequest({
+				url: url,
+				json: json,
+				callback: function (req, response) {
+					alert(
+						'req: ' + req + '\n' +
+						'status: ' + req.status + '\n' +
+						'response: ' + objectRepr(response)
+					);
+				}
+			});
+		}
 	</script>
 </head>
 
@@ -56,5 +86,11 @@
 	</p>
 	<p>
 		<button type="button" onclick="testWebGL();">Test webgl</button>
+	</p>
+	<p>
+		<button type="button" onclick="testRequest('https://localhost', true);">Test request on "https://localhost" as json</button>
+		<button type="button" onclick="testRequest('https://localhost', false);">Test request on "https://localhost" as html</button>
+		<button type="button" onclick="testRequest('nope', true);">Test request on "nope" as json</button>
+		<button type="button" onclick="testRequest('nope', false);">Test request on "nope" as html</button>
 	</p>
 </body>
