@@ -379,7 +379,7 @@ if (shouldBeDefined('isInIframe')) {
 if (shouldBeDefined('ignoreUntilFocusChanges')) {
     jsu.ignoreUntilFocusChanges = false;
     jsu.attemptFocus = function (element) {
-        if (!this.is_focusable(element)) {
+        if (!this.isFocusable(element)) {
             return false;
         }
         jsu.ignoreUntilFocusChanges = true;
