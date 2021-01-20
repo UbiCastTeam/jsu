@@ -61,7 +61,7 @@ if (typeof window.Event !== 'function') {
 
 
 /* ---- jsu object definition ---- */
-const VERSION = 1;
+const VERSION = 2;
 const jsu = window.jsu ? window.jsu : {version: VERSION};
 window.jsu = jsu;
 const shouldBeDefined = function (attribute) {
@@ -201,11 +201,32 @@ if (shouldBeDefined('onDOMLoad')) {
 
 if (shouldBeDefined('httpRequest')) {
     jsu.httpRequest = function (args) {
+        /* args = {
+            method: 'GET',
+            url: '',
+            headers: {},
+            params: {},
+            data: {},
+            cache: false,
+            json: false,
+            jsonData: false,
+            progress: function (event) {},
+            callback: function (xhr, response) {}, // response is decoded JSON if json else response text.
+        } */
         const params = args.params ? args.params : {};
-        if (args.cache === undefined || args.cache) {
+        if (!args.cache) {
             params._ = (new Date()).getTime();
         }
-        let url = args.url;
+        const method = args.method ? args.method.toUpperCase() : 'GET';
+        let url = args.url ? args.url : '';
+        const headers = args.headers ? args.headers : {};
+        const noCSRF = (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        if (!noCSRF) {
+            const csrftoken = jsu.getCookie('csrftoken');
+            if (csrftoken) {
+                headers['X-CSRFToken'] = csrftoken;
+            }
+        }
         const urlParams = [];
         let field;
         for (field in params) {
@@ -215,7 +236,10 @@ if (shouldBeDefined('httpRequest')) {
             url += '?' + urlParams.join('&');
         }
         let formData;
-        if (args.data instanceof FormData) {
+        if (args.jsonData) {
+            headers['Content-Type'] = 'application/json; charset=UTF-8';
+            formData = args.data;
+        } else if (args.data instanceof FormData) {
             formData = args.data;
         } else if (args.data) {
             formData = new FormData();
@@ -225,12 +249,12 @@ if (shouldBeDefined('httpRequest')) {
         } else {
             formData = null;
         }
-        const req = new XMLHttpRequest();
-        if (args.progress && req.upload) {
-            req.upload.addEventListener('progress', args.progress, false);
+        const xhr = new XMLHttpRequest();
+        if (args.progress && xhr.upload) {
+            xhr.upload.addEventListener('progress', args.progress, false);
         }
         if (args.callback) {
-            req.onreadystatechange = function () {
+            xhr.onreadystatechange = function () {
                 if (this.readyState !== XMLHttpRequest.DONE) {
                     return;
                 }
@@ -258,9 +282,13 @@ if (shouldBeDefined('httpRequest')) {
                 args.callback(this, response);
             };
         }
-        req.open(args.method ? args.method : 'GET', url, true);
-        req.send(formData);
-        return req;
+        xhr.open(method, url, true);
+        let header;
+        for (header in headers) {
+            xhr.setRequestHeader(header, headers[header]);
+        }
+        xhr.send(formData);
+        return xhr;
     };
 }
 
