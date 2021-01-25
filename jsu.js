@@ -313,6 +313,9 @@ if (shouldBeDefined('compareVersions')) {
 
 if (shouldBeDefined('setObjectAttributes')) {
     jsu.setObjectAttributes = function (obj, data, allowedAttributes) {
+        if (!data) {
+            return;
+        }
         if ('translations' in data) {
             // Update translations
             jsu.addTranslations(data.translations);
