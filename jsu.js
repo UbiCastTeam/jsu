@@ -233,7 +233,7 @@ if (shouldBeDefined('httpRequest')) {
             urlParams.push(encodeURIComponent(field) + '=' + encodeURIComponent(params[field]));
         }
         if (urlParams.length > 0) {
-            url += '?' + urlParams.join('&');
+            url += (url.indexOf('?') === -1 ? '?' : '&') + urlParams.join('&');
         }
         let formData;
         if (args.jsonData) {
