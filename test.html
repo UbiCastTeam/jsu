@@ -9,7 +9,7 @@
 	<script type="text/javascript" src="jsu.js"></script>
 
 	<script type="text/javascript">
-		function objectRepr(obj) {
+		function objectRepr (obj) {
 			let repr = '';
 			if (typeof obj == 'string') {
 				repr = '\n  ' + obj
@@ -25,72 +25,113 @@
 			return repr;
 		}
 
-		function testTranslation() {
+		function testTranslation () {
 			const expected = 'test trad';
 			jsu.addTranslations({'test label': expected});
-			alert(
-				'Current lang: ' + jsu.getCurrentLang() + '\n' +
+
+			const repr = 'Current lang: ' + jsu.getCurrentLang() + '\n' +
 				jsu.translate('test label') + '\n' +
-				'Test: ' + (jsu.translate('test label') == expected ? 'OK' : 'FAIL')
-			);
+				'Test: ' + (jsu.translate('test label') == expected ? 'OK' : 'FAIL');
+
+			const ele = document.getElementById('translations_report');
+			ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';
 		}
 
-		function testUserAgent() {
-			// trigger internal user agent change
-			const ua = document.getElementById('userAgent').value;
-			if (ua) {
-				jsu.userAgent = ua.toLowerCase();
-				jsu._getBrowserInfo();
-			}
-			alert(
-				'jsu.userAgent: ' + jsu.userAgent + '\n' +
+		function displayUserAgent () {
+			const repr = 'jsu.userAgent: ' + jsu.userAgent + '\n' +
+				'jsu.userAgentData: ' + jsu.userAgentData + '\n' +
 				'jsu.osName: ' + jsu.osName + '\n' +
 				'jsu.osVersion: ' + jsu.osVersion + '\n' +
 				'jsu.browserName: ' + jsu.browserName + '\n' +
 				'jsu.browserVersion: ' + jsu.browserVersion + '\n' +
 				'jsu.browserVersion (type): ' + (typeof jsu.browserVersion) + '\n' +
 				'jsu.isMobile: ' + jsu.isMobile + '\n' +
-				'jsu.isTactile: ' + jsu.isTactile
-			);
+				'jsu.isTactile: ' + jsu.isTactile + '\n' +
+				'\n' +
+				'window.navigator.platform: ' + (window.navigator && window.navigator.platform ? window.navigator.platform : 'none') + '\n' +
+				'window.navigator.appVersion: ' + (window.navigator && window.navigator.appVersion ? window.navigator.appVersion : 'none') + '\n' +
+				'window.navigator.userAgentData: ' + (window.navigator && window.navigator.userAgentData ? window.navigator.userAgentData : 'none') + '\n' +
+				'window.navigator.userAgentData.mobile: ' + (window.navigator && window.navigator.userAgentData ? window.navigator.userAgentData.mobile : 'none') + '\n' +
+				'window.navigator.userAgentData.brands: ' + (window.navigator && window.navigator.userAgentData ? objectRepr(window.navigator.userAgentData.brands) : 'none') + '\n' +
+				'';
+			if (window.navigator && window.navigator.userAgentData && window.navigator.getHighEntropyValues) {
+				// Log the full user-agent data
+				window.navigator.userAgentData.getHighEntropyValues(
+					['architecture', 'model', 'platform', 'platformVersion', 'uaFullVersion'])
+					.then(ua => { console.log(ua) });
+			}
+
+			const ele = document.getElementById('user_agent_report');
+			ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';
+		}
+
+		function testUserAgent () {
+			// trigger internal user agent change
+			const ua = document.getElementById('userAgent').value;
+			if (ua) {
+				jsu.userAgent = ua.toLowerCase();
+				jsu._getBrowserInfo();
+			}
+			displayUserAgent();
 			return false;
 		}
 
-		function testWebGL() {
-			alert('jsu.getWebglContext: ' + jsu.getWebglContext());
+		function testWebGL () {
+			const repr = 'jsu.getWebglContext: ' + jsu.getWebglContext();
+
+			const ele = document.getElementById('webgl_report');
+			ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';
 		}
 
-		function testRequest(url, json) {
+		function testRequest (url, json) {
 			jsu.httpRequest({
 				url: url,
 				json: json,
 				callback: function (req, response) {
-					alert(
-						'req: ' + req + '\n' +
+					const repr = 'req: ' + req + '\n' +
 						'status: ' + req.status + '\n' +
-						'response: ' + objectRepr(response)
-					);
+						'response: ' + objectRepr(response);
+
+					const ele = document.getElementById('requests_report');
+					ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';
 				}
 			});
 		}
+
+		jsu.onDOMLoad(function () {
+			displayUserAgent();
+			testTranslation();
+			testWebGL();
+		});
 	</script>
 </head>
 
 <body>
 	<h1>JSU test page</h1>
-	<p>
-		<button type="button" onclick="testTranslation();">Test translations</button>
-	</p>
-	<p>
+
+	<fieldset>
+		<legend>Translations</legend>
+		<div id="translations_report"></div>
+	</fieldset>
+
+	<fieldset>
+		<legend>User agent</legend>
 		<button type="button" onclick="testUserAgent();">Test user agent</button>
-		<input type="text" name="userAgent" id="userAgent" style="width: 90%" placeholder="User agent to test (local user agent if empty)"/>
-	</p>
-	<p>
-		<button type="button" onclick="testWebGL();">Test webgl</button>
-	</p>
-	<p>
+		<input type="text" name="userAgent" id="userAgent" style="width: 90%" placeholder="User agent to test (local user agent if empty)"/><br/>
+		<span id="user_agent_report"></span>
+	</fieldset>
+
+	<fieldset>
+		<legend>Webgl</legend>
+		<div id="webgl_report"></div>
+	</fieldset>
+
+	<fieldset>
+		<legend>Requests</legend>
 		<button type="button" onclick="testRequest('https://localhost', true);">Test request on "https://localhost" as json</button>
 		<button type="button" onclick="testRequest('https://localhost', false);">Test request on "https://localhost" as html</button>
 		<button type="button" onclick="testRequest('nope', true);">Test request on "nope" as json</button>
 		<button type="button" onclick="testRequest('nope', false);">Test request on "nope" as html</button>
-	</p>
+		<div id="requests_report"></div>
+	</fieldset>
 </body>

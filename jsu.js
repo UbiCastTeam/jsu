@@ -469,10 +469,12 @@ if (shouldBeDefined('ignoreUntilFocusChanges')) {
 /* User agent and platform related functions */
 if (shouldBeDefined('userAgent')) {
     jsu.userAgent = window.navigator && window.navigator.userAgent ? window.navigator.userAgent.toLowerCase() : 'unknown';
+    jsu.userAgentData = null;
 
     jsu._getOSInfo = function () {
         let name;
         let version;
+        /* TODO: Find a synchronous way to get platform.
         if (window.navigator && window.navigator.userAgentData) {
             window.navigator.userAgentData.getHighEntropyValues(['platform']).then(function (data) {
                 if (data.platform) {
@@ -480,25 +482,26 @@ if (shouldBeDefined('userAgent')) {
                     if (data.platform == 'Mac OS X') {
                         name = 'macos';
                     }
+                    jsu.userAgentPlatform = name;
                 }
             });
-        } else {
-            if (window.navigator && window.navigator.platform) {
-                const platform = window.navigator.platform.toLowerCase();
-                if (platform.indexOf('ipad') != -1 || platform.indexOf('iphone') != -1 || platform.indexOf('ipod') != -1) {
-                    name = 'ios';
-                    version = parseFloat(('' + (/CPU.*OS ([0-9_]{1,5})|(CPU like).*AppleWebKit.*Mobile/i.exec(navigator.userAgent) || [0,''])[1]).replace('undefined', '3_2').replace('_', '.').replace('_', '')) || false;
-                }
+        }
+        */
+        if (!name && window.navigator && window.navigator.platform) {
+            const platform = window.navigator.platform.toLowerCase();
+            if (platform.indexOf('ipad') != -1 || platform.indexOf('iphone') != -1 || platform.indexOf('ipod') != -1) {
+                name = 'ios';
+                version = parseFloat(('' + (/CPU.*OS ([0-9_]{1,5})|(CPU like).*AppleWebKit.*Mobile/i.exec(navigator.userAgent) || [0,''])[1]).replace('undefined', '3_2').replace('_', '.').replace('_', '')) || false;
             }
-            if (!name && window.navigator && window.navigator.appVersion) {
-                const appVersion = window.navigator.appVersion.toLowerCase();
-                if (appVersion.indexOf('win') != -1) {
-                    name = 'windows';
-                } else if (appVersion.indexOf('mac') != -1) {
-                    name = 'macos';
-                } else if (appVersion.indexOf('x11') != -1 || appVersion.indexOf('linux') != -1) {
-                    name = 'linux';
-                }
+        }
+        if (!name && window.navigator && window.navigator.appVersion) {
+            const appVersion = window.navigator.appVersion.toLowerCase();
+            if (appVersion.indexOf('win') != -1) {
+                name = 'windows';
+            } else if (appVersion.indexOf('mac') != -1) {
+                name = 'macos';
+            } else if (appVersion.indexOf('x11') != -1 || appVersion.indexOf('linux') != -1) {
+                name = 'linux';
             }
         }
         jsu.osName = name ? name : 'unknown';
@@ -508,19 +511,21 @@ if (shouldBeDefined('userAgent')) {
 
     jsu._getBrowserInfo = function () {
         // get browser name and version
-        let name = 'unknown';
+        let name;
         let version = 0.0;
-        if (window.navigator && window.navigator.userAgentData) {
-            jsu.isMobile = window.navigator.userAgentData.mobile;
-            const browser = window.navigator.userAgentData.uaList ? window.navigator.userAgentData.uaList[0] : null;
+        if (window.navigator && window.navigator.userAgentData && window.navigator.userAgentData.brands) {
+            jsu.isMobile = Boolean(window.navigator.userAgentData.mobile);
+            const browser = window.navigator.userAgentData.brands[0];
             if (browser) {
                 name = browser.brand.toLowerCase();
                 version = parseFloat(browser.version);
-                if (browser.brand == 'Google Chrome') {
+                if (name == 'google chrome') {
                     name = 'chrome';
                 }
+                jsu.userAgentData = window.navigator.userAgentData;
             }
-        } else {
+        }
+        if (!name && jsu.userAgent) {
             const extractVersion = function (ua, re) {
                 const matches = ua.match(re);
                 if (matches && !isNaN(parseInt(matches[1], 10))) {
@@ -580,7 +585,7 @@ if (shouldBeDefined('userAgent')) {
         }
         jsu.isTactile = document.documentElement && 'ontouchstart' in document.documentElement;
 
-        jsu.browserName = name;
+        jsu.browserName = name ? name : 'unknown';
         jsu.browserVersion = version;
     };
     jsu._getBrowserInfo();
