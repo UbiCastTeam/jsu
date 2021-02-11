@@ -514,15 +514,17 @@ if (shouldBeDefined('userAgent')) {
         let name;
         let version = 0.0;
         if (window.navigator && window.navigator.userAgentData && window.navigator.userAgentData.brands) {
-            jsu.isMobile = Boolean(window.navigator.userAgentData.mobile);
-            const browser = window.navigator.userAgentData.brands[0];
-            if (browser) {
-                name = browser.brand.toLowerCase();
-                version = parseFloat(browser.version);
-                if (name == 'google chrome') {
-                    name = 'chrome';
+            for (let i = 0; i < window.navigator.userAgentData.brands.length; i++) {
+                const bd = window.navigator.userAgentData.brands[i];
+                if (bd && bd.brand.indexOf(';') == -1) {
+                    name = bd.brand.toLowerCase();
+                    version = parseFloat(bd.version);
+                    if (name == 'google chrome') {
+                        name = 'chrome';
+                    }
+                    jsu.userAgentData = window.navigator.userAgentData;
+                    break;
                 }
-                jsu.userAgentData = window.navigator.userAgentData;
             }
         }
         if (!name && jsu.userAgent) {
@@ -580,7 +582,12 @@ if (shouldBeDefined('userAgent')) {
                 name = 'safari';
                 version = extractVersion(ua, /version\/(\d+)\.(\d+)/);
             }
-            // detect type of device
+        }
+        // detect type of device
+        if (window.navigator && window.navigator.userAgentData) {
+            jsu.isMobile = Boolean(window.navigator.userAgentData.mobile);
+        } else {
+            const ua = jsu.userAgent;
             jsu.isMobile = ua.indexOf('iphone') != -1 || ua.indexOf('ipod') != -1 || ua.indexOf('android') != -1 || ua.indexOf('iemobile') != -1 || ua.indexOf('opera mobi') != -1 || ua.indexOf('opera mini') != -1 || ua.indexOf('windows ce') != -1 || ua.indexOf('fennec') != -1 || ua.indexOf('series60') != -1 || ua.indexOf('symbian') != -1 || ua.indexOf('blackberry') != -1 || window.orientation !== undefined || (window.navigator && window.navigator.platform == 'iPad');
         }
         jsu.isTactile = document.documentElement && 'ontouchstart' in document.documentElement;
