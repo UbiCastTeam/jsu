@@ -25,13 +25,41 @@
 			return repr;
 		}
 
-		function testTranslation () {
-			const expected = 'test trad';
-			jsu.addTranslations({'test label': expected});
+		function assertEqual(valA, valB, message) {
+			if (valA === valB) {
+				return 'OK';
+			} else {
+				return 'FAIL: "' + valA + '" != "' + valB + '"' + (message ? ' ' + message : '');
+			}
+		}
 
-			const repr = 'Current lang: ' + jsu.getCurrentLang() + '\n' +
-				jsu.translate('test label') + '\n' +
-				'Test: ' + (jsu.translate('test label') == expected ? 'OK' : 'FAIL');
+		function testTranslation () {
+			const label = 'test label';
+			const expected = 'test trad';
+			const data = {};
+			data[label] = expected;
+			jsu.addTranslations(data);
+
+			let repr = 'Test 1\n' +
+				'Current lang: ' + jsu.getCurrentLang() + '\n' +
+				jsu.translate(label) + '\n' +
+				'Test lang: ' + assertEqual(jsu.getCurrentLang(), 'en') + '\n' +
+				'Test trans: ' + assertEqual(jsu.translate(label), expected);
+
+			const label2 = 'test label 2';
+			const expected2 = 'test trad 2';
+			const data2 = {};
+			data2[label2] = expected2;
+			data2[label] = '';  // should use defaut translation
+			jsu.addTranslations(data2, 'fr');
+			jsu.useLang('fr');
+
+			repr += '\n\nTest 2\n' +
+				'Current lang: ' + jsu.getCurrentLang() + '\n' +
+				jsu.translate(label2) + '\n' +
+				'Test lang: ' + assertEqual(jsu.getCurrentLang(), 'fr') + '\n' +
+				'Test trans: ' + assertEqual(jsu.translate(label2), expected2) + '\n' +
+				'Test last trans: ' + assertEqual(jsu.translate(label), expected);
 
 			const ele = document.getElementById('translations_report');
 			ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';

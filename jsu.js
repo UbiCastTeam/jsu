@@ -626,7 +626,10 @@ if (shouldBeDefined('translate')) {
         }
         let text;
         for (text in translations) {
-            catalog[text] = translations[text];
+            if (translations[text]) {
+                // empty texts are ignored to use default texts
+                catalog[text] = translations[text];
+            }
         }
     };
     jsu.translate = function (text) {
