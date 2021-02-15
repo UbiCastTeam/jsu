@@ -6,6 +6,36 @@
 
 	<title>JSU test page</title>
 
+	<style>
+		html {
+			background: #444;
+			color: #eee;
+			text-align: left;
+			font-size: 18px;
+			font-family: Arial, sans-serif;
+		}
+		html, body {
+			margin: 0;
+		}
+		header {
+			padding: 0.1em 1em;
+			background: #222;
+			color: #fff;
+		}
+		main {
+			padding: 1em 2em;
+		}
+		img {
+			max-width: 100%;
+		}
+		a {
+			color: #28f;
+		}
+		fieldset {
+			margin: 1em 0;
+		}
+	</style>
+
 	<script type="text/javascript" src="jsu.js"></script>
 
 	<script type="text/javascript">
@@ -62,7 +92,7 @@
 				'Test last trans: ' + assertEqual(jsu.translate(label), expected);
 
 			const ele = document.getElementById('translations_report');
-			ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';
+			ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
 		}
 
 		function displayUserAgent () {
@@ -90,7 +120,7 @@
 			}
 
 			const ele = document.getElementById('user_agent_report');
-			ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';
+			ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
 		}
 
 		function testUserAgent () {
@@ -108,7 +138,7 @@
 			const repr = 'jsu.getWebglContext: ' + jsu.getWebglContext();
 
 			const ele = document.getElementById('webgl_report');
-			ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';
+			ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
 		}
 
 		function testRequest (url, json) {
@@ -121,12 +151,13 @@
 						'response: ' + objectRepr(response);
 
 					const ele = document.getElementById('requests_report');
-					ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';
+					ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
 				}
 			});
 		}
 
 		jsu.onDOMLoad(function () {
+			document.getElementById('version').innerHTML = jsu.version;
 			displayUserAgent();
 			testTranslation();
 			testWebGL();
@@ -135,31 +166,36 @@
 </head>
 
 <body>
-	<h1>JSU test page</h1>
+	<header>
+		<h1><a href="https://github.com/UbiCastTeam/jsu">JSU test page</a></h1>
+		<p>JSU version: <span id="version"></span></p>
+	</header>
 
-	<fieldset>
-		<legend>Translations</legend>
-		<div id="translations_report"></div>
-	</fieldset>
+	<main>
+		<fieldset>
+			<legend>Translations</legend>
+			<div id="translations_report"></div>
+		</fieldset>
 
-	<fieldset>
-		<legend>User agent</legend>
-		<button type="button" onclick="testUserAgent();">Test user agent</button>
-		<input type="text" name="userAgent" id="userAgent" style="width: 90%" placeholder="User agent to test (local user agent if empty)"/><br/>
-		<span id="user_agent_report"></span>
-	</fieldset>
+		<fieldset>
+			<legend>User agent</legend>
+			<button type="button" onclick="testUserAgent();">Test user agent</button>
+			<input type="text" name="userAgent" id="userAgent" style="width: 90%" placeholder="User agent to test (local user agent if empty)"/><br/>
+			<span id="user_agent_report"></span>
+		</fieldset>
 
-	<fieldset>
-		<legend>Webgl</legend>
-		<div id="webgl_report"></div>
-	</fieldset>
+		<fieldset>
+			<legend>Webgl</legend>
+			<div id="webgl_report"></div>
+		</fieldset>
 
-	<fieldset>
-		<legend>Requests</legend>
-		<button type="button" onclick="testRequest('https://localhost', true);">Test request on "https://localhost" as json</button>
-		<button type="button" onclick="testRequest('https://localhost', false);">Test request on "https://localhost" as html</button>
-		<button type="button" onclick="testRequest('nope', true);">Test request on "nope" as json</button>
-		<button type="button" onclick="testRequest('nope', false);">Test request on "nope" as html</button>
-		<div id="requests_report"></div>
-	</fieldset>
+		<fieldset>
+			<legend>Requests</legend>
+			<button type="button" onclick="testRequest('https://localhost', true);">Test request on "https://localhost" as json</button>
+			<button type="button" onclick="testRequest('https://localhost', false);">Test request on "https://localhost" as html</button>
+			<button type="button" onclick="testRequest('nope', true);">Test request on "nope" as json</button>
+			<button type="button" onclick="testRequest('nope', false);">Test request on "nope" as html</button>
+			<div id="requests_report"></div>
+		</fieldset>
+	</main>
 </body>
