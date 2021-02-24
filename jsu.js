@@ -61,7 +61,7 @@ if (typeof window.Event !== 'function') {
 
 
 /* ---- jsu object definition ---- */
-const VERSION = 2;
+const VERSION = 3;
 const jsu = window.jsu ? window.jsu : {version: VERSION};
 window.jsu = jsu;
 const shouldBeDefined = function (attribute) {
@@ -615,6 +615,9 @@ if (shouldBeDefined('translate')) {
         return jsu._currentLang;
     };
     jsu.addTranslations = function (translations, lang) {
+        // translations keys must be text or context + '\u0004' + text
+        // example for translations:
+        // {'text source 1': 'translated text 1', 'context\u0004text source 2': 'translated text 2'}
         let catalog;
         if (lang) {
             if (!jsu._translations[lang]) {
@@ -632,11 +635,12 @@ if (shouldBeDefined('translate')) {
             }
         }
     };
-    jsu.translate = function (text) {
-        if (text in jsu._currentCatalog) {
-            return jsu._currentCatalog[text];
-        } else if (jsu._currentLang != 'en' && text in jsu._translations.en) {
-            return jsu._translations.en[text];
+    jsu.translate = function (text, context) {
+        const key = (context ? context + '\u0004' : '') + text;
+        if (key in jsu._currentCatalog) {
+            return jsu._currentCatalog[key];
+        } else if (jsu._currentLang != 'en' && key in jsu._translations.en) {
+            return jsu._translations.en[key];
         }
         return text;
     };

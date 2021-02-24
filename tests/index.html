@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+
+    <title>JSU test page</title>
+
+    <style>
+        html {
+            background: #444;
+            color: #eee;
+            text-align: left;
+            font-size: 18px;
+            font-family: Arial, sans-serif;
+        }
+        html, body {
+            margin: 0;
+        }
+        header {
+            padding: 0.1em 1em;
+            background: #222;
+            color: #fff;
+        }
+        main {
+            padding: 1em 2em;
+        }
+        img {
+            max-width: 100%;
+        }
+        a {
+            color: #28f;
+        }
+        fieldset {
+            margin: 1em 0;
+        }
+    </style>
+
+    <script type="text/javascript" src="../jsu.js"></script>
+    <script type="text/javascript" src="tests.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1><a href="https://github.com/UbiCastTeam/jsu">JSU test page</a></h1>
+        <p>JSU version: <span id="version"></span></p>
+    </header>
+
+    <main>
+        <fieldset>
+            <legend>User agent</legend>
+            <button type="button" id="test_user_agent">Test user agent</button>
+            <input type="text" name="user_agent" id="user_agent" style="width: 90%" placeholder="User agent to test (local user agent if empty)"/><br/>
+            <span id="user_agent_report"></span>
+        </fieldset>
+
+        <fieldset>
+            <legend>Webgl</legend>
+            <div id="webgl_report"></div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Translations</legend>
+            <div id="translations_report"></div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Requests</legend>
+            <button type="button" id="test_request_localhost_json">Test request on "https://localhost" as json</button>
+            <button type="button" id="test_request_localhost_html">Test request on "https://localhost" as html</button>
+            <button type="button" id="test_request_nope_json">Test request on "nope" as json</button>
+            <button type="button" id="test_request_nope_html">Test request on "nope" as html</button>
+            <div id="requests_report"></div>
+        </fieldset>
+    </main>
+</body>
