@@ -116,6 +116,21 @@ function testTranslation () {
         'Test lang: ' + assertEqual(jsu.getCurrentLang(), 'fr') + '\n' +
         'Test trans with context: ' + assertEqual(jsu.translate(label3, 'test context'), expected3);
 
+    const label4 = 'test label 4 <"test">';
+    const data4 = {};
+    data4[label4] = 'test trad 4 <"test">';
+    const expected4a = jsu.escapeHTML(data4[label4]);
+    const expected4b = 'test trad 4 <&quot;test&quot;>';
+    jsu.useLang('en');
+    jsu.addTranslations(data4, 'en');
+
+    repr += '\n\nTest 4\n' +
+        'Current lang: ' + jsu.getCurrentLang() + '\n' +
+        jsu.translate(label4) + '\n' +
+        'Test lang: ' + assertEqual(jsu.getCurrentLang(), 'en') + '\n' +
+        'Test trans with HTML escape: ' + assertEqual(jsu.translateHTML(label4), expected4a) + '\n' +
+        'Test trans with attribute escape: ' + assertEqual(jsu.translateAttribute(label4), expected4b);
+
     const ele = document.getElementById('translations_report');
     ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
 }

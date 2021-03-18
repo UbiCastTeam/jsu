@@ -61,7 +61,7 @@ if (typeof window.Event !== 'function') {
 
 
 /* ---- jsu object definition ---- */
-const VERSION = 3;
+const VERSION = 4;
 const jsu = window.jsu ? window.jsu : {version: VERSION};
 window.jsu = jsu;
 const shouldBeDefined = function (attribute) {
@@ -643,6 +643,16 @@ if (shouldBeDefined('translate')) {
             return jsu._translations.en[key];
         }
         return text;
+    };
+    jsu.translateHTML = function (text, context) {
+        // translate and escape text for HTML usage
+        const trans = jsu.translate(text, context);
+        return jsu.escapeHTML(trans);
+    };
+    jsu.translateAttribute = function (text, context) {
+        // translate and escape text for HTML attribute usage
+        const trans = jsu.translate(text, context);
+        return jsu.escapeAttribute(trans);
     };
     jsu.getDateDisplay = function (date) {
         // date formats: "YYYY-MM-DDTHH:MM:SS" or "YYYY-MM-DD HH:MM:SS"
