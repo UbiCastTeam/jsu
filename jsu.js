@@ -616,6 +616,9 @@ if (shouldBeDefined('translate')) {
     jsu.getCurrentLang = function () {
         return jsu._currentLang;
     };
+    jsu.getCurrentCatalog = function () {
+        return jsu._currentCatalog;
+    };
     jsu.addTranslations = function (translations, lang) {
         // translations keys must be text or context + '\u0004' + text
         // example for translations:
