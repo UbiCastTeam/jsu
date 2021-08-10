@@ -3,8 +3,9 @@
   "version": "8",
   "description": "",
   "main": "gulpfile.js",
+  "type": "module",
   "scripts": {
-    "test": "karma start karma.conf.js",
+    "test": "karma start",
     "build": "gulp build",
     "lint": "eslint ."
   },
@@ -12,6 +13,7 @@
   "license": "LGPLv3",
   "devDependencies": {
     "eslint": "latest",
+    "esmify": "latest",
     "gulp": "latest",
     "gulp-concat": "latest",
     "gulp-minify": "latest",

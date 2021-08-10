@@ -1,47 +1,39 @@
 /*******************************************
 * jsu: JavaScript Utilities                *
 *******************************************/
-
-/* ---- Polyfill definitions ---- */
-
-// Add console functions for old browsers
-if (!window.console) {
-    window.console = {};
-}
-if (!window.console.log) {
-    window.console.log = function () {};
-}
-if (!window.console.error) {
-    window.console.error = window.console.log;
-}
-if (!window.console.debug) {
-    window.console.debug = window.console.log;
-}
-if (!window.console.info) {
-    window.console.info = window.console.log;
-}
-if (!window.console.warn) {
-    window.console.warn = window.console.log;
-}
-
-/* ---- jsu object definition ---- */
 const VERSION = 8;
-const jsu = window.jsu ? window.jsu : {version: VERSION};
-window.jsu = jsu;
-const shouldBeDefined = function (attribute) {
-    // Function to handle other versions of jsu objects
-    const allow = VERSION > jsu.version || !(attribute in jsu);
-    return allow;
-};
-if (VERSION != jsu.version) {
-    console.warn('Another version of jsu.js was already imported, all attributes will be set by most recent version. Version: "' + VERSION + '", other version: "' + jsu.version + '".');
-    if (VERSION > jsu.version) {
-        jsu.version = VERSION;
-    }
-}
 
-if (shouldBeDefined('getCookie')) {
-    jsu.getCookie = function (name, defaultValue) {
+export default class JavaScriptUtilities {
+
+    constructor () {
+        this.version = VERSION;
+        this.ignoreUntilFocusChanges = false;
+        this.userAgent = window.navigator && window.navigator.userAgent ? window.navigator.userAgent.toLowerCase() : 'unknown';
+        this.userAgentData = null;
+        this.osName = '';
+        this.osVersion = '';
+        this.browserName = '';
+        this.browserVersion = '';
+        this.isTactile = false;
+        this.isMobile = false;
+        this._translations = { en: {} };
+        this._currentLang = 'en';
+        this._currentCatalog = this._translations.en;
+        this._getOSInfo();
+        this._getBrowserInfo();
+        this._overrideHttpRequest();
+        if (!window.jsu) {
+            window.jsu = this;
+        } else {
+            if (VERSION != window.jsu.version) {
+                console.warn('Another version of jsu.js was already imported, jsu will be replaced by most recent version. Version: "' + VERSION + '", other version: "' + window.jsu.version + '".');
+            }
+            if (window.jsu.version < VERSION) {
+                window.jsu = this;
+            }
+        }
+    }
+    getCookie (name, defaultValue = '') {
         if (document.cookie.length > 0) {
             let cStart = document.cookie.indexOf(name + '=');
             if (cStart != -1) {
@@ -50,25 +42,22 @@ if (shouldBeDefined('getCookie')) {
                 if (cEnd == -1) {
                     cEnd = document.cookie.length;
                 }
-                return window.unescape(document.cookie.substring(cStart, cEnd));
+                return window.decodeURIComponent(document.cookie.substring(cStart, cEnd));
             }
         }
-        return defaultValue !== undefined ? defaultValue : '';
-    };
-    jsu.setCookie = function (name, value, expireDays) {
+        return defaultValue;
+    }
+    setCookie (name, value, expireDays = 360) {
         const exDate = new Date();
-        exDate.setDate(exDate.getDate() + (expireDays ? expireDays : 360));
+        exDate.setDate(exDate.getDate() + expireDays);
         const secure = window.location.href.indexOf('https://') === 0 ? '; secure; samesite=none' : '';
-        document.cookie = name + '=' + window.escape(value) + '; expires=' + exDate.toUTCString() + '; path=/' + secure;
-    };
-}
-
-if (shouldBeDefined('strip')) {
-    jsu.strip = function (str, characters) {
+        document.cookie = name + '=' + window.decodeURIComponent(value) + '; expires=' + exDate.toUTCString() + '; path=/' + secure;
+    }
+    strip (str, characters = '') {
         if (!str) {
             return str;
         }
-        const crs = characters !== undefined ? characters : ' \n\r\t '; // the last space is a non secable space
+        const crs = characters !== '' ? characters : ' \n\r\t '; // the last space is a non secable space
         let start = 0;
         while (start < str.length && crs.indexOf(str[start]) != -1) {
             start++;
@@ -78,32 +67,24 @@ if (shouldBeDefined('strip')) {
             end--;
         }
         return str.substring(start, end + 1);
-    };
-}
-
-if (shouldBeDefined('slugify')) {
-    jsu.slugify = function (text) {
+    }
+    slugify (text) {
         return text.toString().toLowerCase()
             .replace(/\s+/g, '-') // Replace spaces with -
             .replace(/[^-\w]+/g, '') // Remove all non-word chars
             .replace(/-+/g, '-') // Replace multiple - with single -
             .replace(/^-+/, '') // Trim - from start of text
             .replace(/-+$/, ''); // Trim - from end of text
-    };
-}
-
-if (shouldBeDefined('stripHTML')) {
-    jsu.stripHTML = function (html) {
+    }
+    stripHTML (html) {
         if (!html) {
             return html;
         }
         const div = document.createElement('div');
         div.innerHTML = html;
         return div.textContent;
-    };
-}
-if (shouldBeDefined('decodeHTML')) {
-    jsu.decodeHTML = function (html) {
+    }
+    decodeHTML (html) {
         if (!html) {
             return '';
         }
@@ -111,10 +92,8 @@ if (shouldBeDefined('decodeHTML')) {
         div.innerHTML = html;
         // handle case of empty input
         return div.childNodes.length === 0 ? '' : div.childNodes[0].nodeValue;
-    };
-}
-if (shouldBeDefined('escapeHTML')) {
-    jsu.escapeHTML = function (text) {
+    }
+    escapeHTML (text) {
         if (!text) {
             return text;
         }
@@ -124,10 +103,8 @@ if (shouldBeDefined('escapeHTML')) {
         result = result.replace(/(>)/g, '&gt;');
         result = result.replace(/(\n)/g, '<br/>');
         return result;
-    };
-}
-if (shouldBeDefined('escapeAttribute')) {
-    jsu.escapeAttribute = function (attr) {
+    }
+    escapeAttribute (attr) {
         if (!attr) {
             return attr;
         }
@@ -136,11 +113,8 @@ if (shouldBeDefined('escapeAttribute')) {
         result = result.replace(/(')/g, '&#39;');
         result = result.replace(/(\n)/g, '&#13;&#10;');
         return result;
-    };
-}
-
-if (shouldBeDefined('getClickPosition')) {
-    jsu.getClickPosition = function (evt, dom) {
+    }
+    getClickPosition (evt, dom) {
         let element = dom, xOffset = 0, yOffset = 0;
         // get canvas offset
         while (element !== null && element !== undefined) {
@@ -149,11 +123,8 @@ if (shouldBeDefined('getClickPosition')) {
             element = element.offsetParent;
         }
         return { x: evt.pageX - xOffset, y: evt.pageY - yOffset };
-    };
-}
-
-if (shouldBeDefined('onDOMLoad')) {
-    jsu.onDOMLoad = function (callback) {
+    }
+    onDOMLoad (callback) {
         // see if DOM is already available
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             // call on next available tick
@@ -161,11 +132,8 @@ if (shouldBeDefined('onDOMLoad')) {
         } else {
             document.addEventListener('DOMContentLoaded', callback);
         }
-    };
-}
-
-if (shouldBeDefined('httpRequest')) {
-    jsu.httpRequest = function (args) {
+    }
+    httpRequest (args) {
         /* args = {
             method: 'GET',
             url: '',
@@ -188,7 +156,7 @@ if (shouldBeDefined('httpRequest')) {
         const headers = args.headers ? args.headers : {};
         const noCSRF = (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
         if (!noCSRF) {
-            const csrftoken = jsu.getCookie('csrftoken');
+            const csrftoken = this.getCookie('csrftoken');
             if (csrftoken) {
                 headers['X-CSRFToken'] = csrftoken;
             }
@@ -287,11 +255,8 @@ if (shouldBeDefined('httpRequest')) {
         }
         xhr.send(formData);
         return xhr;
-    };
-}
-
-if (shouldBeDefined('compareVersions')) {
-    jsu.compareVersions = function (v1, comparator, v2) {
+    }
+    compareVersions (v1, comparator, v2) {
         // Function to compare versions like "4.5.6"
         comparator = comparator == '=' ? '==' : comparator;
         const v1parts = v1.split('.'), v2parts = v2.split('.');
@@ -306,17 +271,14 @@ if (shouldBeDefined('compareVersions')) {
             }
         }
         return 0;
-    };
-}
-
-if (shouldBeDefined('setObjectAttributes')) {
-    jsu.setObjectAttributes = function (obj, data, allowedAttributes) {
+    }
+    setObjectAttributes (obj, data, allowedAttributes = null) {
         if (!data) {
             return;
         }
         if ('translations' in data) {
             // Update translations
-            jsu.addTranslations(data.translations);
+            this.addTranslations(data.translations);
             delete data.translations;
         }
         // Override fields
@@ -325,11 +287,8 @@ if (shouldBeDefined('setObjectAttributes')) {
                 obj[attr] = data[attr];
             }
         }
-    };
-}
-
-if (shouldBeDefined('getWebglContext')) {
-    jsu.getWebglContext = function (canvas, options, browserName) {
+    }
+    getWebglContext (canvas, options = {}, browserName = '') {
         if (window.WebGLRenderingContext) {
             try {
                 let webglContext;
@@ -350,36 +309,27 @@ if (shouldBeDefined('getWebglContext')) {
         }
         console.log('Your browser does not support Webgl context');
         return null;
-    };
-}
-
-if (shouldBeDefined('isInIframe')) {
-    jsu.isInIframe = function () {
+    }
+    isInIframe () {
         if (window.frameElement && window.frameElement.nodeName == 'IFRAME') {
             return true;
         }
         return false;
-    };
-}
-
-
-/* Focus related functions */
-if (shouldBeDefined('ignoreUntilFocusChanges')) {
-    jsu.ignoreUntilFocusChanges = false;
-    jsu.attemptFocus = function (element) {
+    }
+    attemptFocus (element) {
         if (!this.isFocusable(element)) {
             return false;
         }
-        jsu.ignoreUntilFocusChanges = true;
+        this.ignoreUntilFocusChanges = true;
         try {
             element.focus();
         } catch (e) {
             console.log('Failed to focus element.', element, e);
         }
-        jsu.ignoreUntilFocusChanges = false;
+        this.ignoreUntilFocusChanges = false;
         return (document.activeElement === element);
-    };
-    jsu.isFocusable = function (element) {
+    }
+    isFocusable (element) {
         if (element.tabIndex > 0 || (element.tabIndex === 0 && element.getAttribute('tabIndex') !== null)) {
             return true;
         }
@@ -400,35 +350,27 @@ if (shouldBeDefined('ignoreUntilFocusChanges')) {
             default:
                 return false;
         }
-    };
-    jsu.focusFirstDescendant = function (element) {
+    }
+    focusFirstDescendant (element) {
         for (let i = 0; i < element.childNodes.length; i++) {
             const child = element.childNodes[i];
-            if (jsu.attemptFocus(child) ||
-                jsu.focusFirstDescendant(child)) {
+            if (this.attemptFocus(child) ||
+                this.focusFirstDescendant(child)) {
                 return true;
             }
         }
         return false;
-    };
-    jsu.focusLastDescendant = function (element) {
+    }
+    focusLastDescendant (element) {
         for (let i = element.childNodes.length - 1; i >= 0; i--) {
             const child = element.childNodes[i];
-            if (jsu.attemptFocus(child) || jsu.focusLastDescendant(child)) {
+            if (this.attemptFocus(child) || this.focusLastDescendant(child)) {
                 return true;
             }
         }
         return false;
-    };
-}
-
-
-/* User agent and platform related functions */
-if (shouldBeDefined('userAgent')) {
-    jsu.userAgent = window.navigator && window.navigator.userAgent ? window.navigator.userAgent.toLowerCase() : 'unknown';
-    jsu.userAgentData = null;
-
-    jsu._getOSInfo = function () {
+    }
+    _getOSInfo () {
         let name;
         let version;
         /* TODO: Find a synchronous way to get platform.
@@ -439,7 +381,7 @@ if (shouldBeDefined('userAgent')) {
                     if (data.platform == 'Mac OS X') {
                         name = 'macos';
                     }
-                    jsu.userAgentPlatform = name;
+                    this.userAgentPlatform = name;
                 }
             });
         }
@@ -461,12 +403,10 @@ if (shouldBeDefined('userAgent')) {
                 name = 'linux';
             }
         }
-        jsu.osName = name ? name : 'unknown';
-        jsu.osVersion = version ? version : 0;
-    };
-    jsu._getOSInfo();
-
-    jsu._getBrowserInfo = function () {
+        this.osName = name ? name : 'unknown';
+        this.osVersion = version ? version : 0;
+    }
+    _getBrowserInfo () {
         // get browser name and version
         let name;
         let version = 0.0;
@@ -484,12 +424,12 @@ if (shouldBeDefined('userAgent')) {
                     } else if (name == 'microsoft edge') {
                         name = 'edge';
                     }
-                    jsu.userAgentData = window.navigator.userAgentData;
+                    this.userAgentData = window.navigator.userAgentData;
                     break;
                 }
             }
         }
-        if (!name && jsu.userAgent) {
+        if (!name && this.userAgent) {
             const extractVersion = function (ua, re) {
                 const matches = ua.match(re);
                 if (matches && !isNaN(parseInt(matches[1], 10))) {
@@ -506,7 +446,7 @@ if (shouldBeDefined('userAgent')) {
                 }
                 return 0.0;
             };
-            const ua = jsu.userAgent;
+            const ua = this.userAgent;
             if (ua.indexOf('firefox') != -1) {
                 name = 'firefox';
                 version = extractVersion(ua, /firefox\/(\d+)\.(\d+)/);
@@ -547,66 +487,54 @@ if (shouldBeDefined('userAgent')) {
         }
         // detect type of device
         if (window.navigator && window.navigator.userAgentData) {
-            jsu.isMobile = Boolean(window.navigator.userAgentData.mobile);
+            this.isMobile = Boolean(window.navigator.userAgentData.mobile);
         } else {
-            const ua = jsu.userAgent;
-            jsu.isMobile = ua.indexOf('iphone') != -1 || ua.indexOf('ipod') != -1 || ua.indexOf('android') != -1 || ua.indexOf('iemobile') != -1 || ua.indexOf('opera mobi') != -1 || ua.indexOf('opera mini') != -1 || ua.indexOf('windows ce') != -1 || ua.indexOf('fennec') != -1 || ua.indexOf('series60') != -1 || ua.indexOf('symbian') != -1 || ua.indexOf('blackberry') != -1 || window.orientation !== undefined || (window.navigator && window.navigator.platform == 'iPad');
+            const ua = this.userAgent;
+            this.isMobile = ua.indexOf('iphone') != -1 || ua.indexOf('ipod') != -1 || ua.indexOf('android') != -1 || ua.indexOf('iemobile') != -1 || ua.indexOf('opera mobi') != -1 || ua.indexOf('opera mini') != -1 || ua.indexOf('windows ce') != -1 || ua.indexOf('fennec') != -1 || ua.indexOf('series60') != -1 || ua.indexOf('symbian') != -1 || ua.indexOf('blackberry') != -1 || window.orientation !== undefined || (window.navigator && window.navigator.platform == 'iPad');
         }
-        jsu.isTactile = document.documentElement && 'ontouchstart' in document.documentElement;
+        this.isTactile = document.documentElement && 'ontouchstart' in document.documentElement;
 
-        jsu.browserName = name ? name : 'unknown';
-        jsu.browserVersion = version;
-    };
-    jsu._getBrowserInfo();
-}
-
-if (shouldBeDefined('isRecordingAvailable')) {
-    jsu.isRecordingAvailable = function () {
-        const isFirefoxCompat = jsu.browserName === 'firefox' && jsu.browserVersion >= 45;
-        const isChromeCompat = (jsu.browserName === 'chrome' || jsu.browserName === 'chromium') && jsu.browserVersion >= 57;
-        const isSafariCompat = jsu.browserName === 'safari' && jsu.browserVersion >= 16;
-        const isEdgeCompat = jsu.browserName === 'edge' && jsu.browserVersion >= 79;
-        return isFirefoxCompat || isSafariCompat || isChromeCompat || isEdgeCompat;
-    };
-}
-if (shouldBeDefined('isLivestreamingAvailable')) {
-    jsu.isLivestreamingAvailable = function () {
-        const isChromeCompat = (jsu.browserName === 'chrome' || jsu.browserName === 'chromium') && jsu.browserVersion >= 57;
-        const isEdgeCompat = jsu.browserName === 'edge' && jsu.browserVersion >= 79;
-        const isSafariCompat = jsu.browserName === 'safari' && jsu.browserVersion >= 16;
+        this.browserName = name ? name : 'unknown';
+        this.browserVersion = version;
+    }
+    isRecordingAvailable () {
+        const isFirefoxCompat = this.browserName === 'firefox' && this.browserVersion >= 45;
+        const isChromeCompat = (this.browserName === 'chrome' || this.browserName === 'chromium') && this.browserVersion >= 57;
+        const isSafariCompat = this.browserName === 'safari' && this.browserVersion >= 16;
+        const isEdgeCompat = this.browserName === 'edge' && this.browserVersion >= 79;
+        return isFirefoxCompat || isChromeCompat || isEdgeCompat || isSafariCompat;
+    }
+    isLivestreamingAvailable () {
+        const isChromeCompat = (this.browserName === 'chrome' || this.browserName === 'chromium') && this.browserVersion >= 57;
+        const isEdgeCompat = this.browserName === 'edge' && this.browserVersion >= 79;
+        const isSafariCompat = this.browserName === 'safari' && this.browserVersion >= 16;
         return isChromeCompat || isEdgeCompat || isSafariCompat;
-    };
-}
-/* Translations related functions */
-if (shouldBeDefined('translate')) {
-    jsu._translations = { en: {} };
-    jsu._currentLang = 'en';
-    jsu._currentCatalog = jsu._translations.en;
-    jsu.useLang = function (lang) {
-        jsu._currentLang = lang;
-        if (!jsu._translations[lang]) {
-            jsu._translations[lang] = {};
+    }
+    useLang (lang) {
+        this._currentLang = lang;
+        if (!this._translations[lang]) {
+            this._translations[lang] = {};
         }
-        jsu._currentCatalog = jsu._translations[lang];
-    };
-    jsu.getCurrentLang = function () {
-        return jsu._currentLang;
-    };
-    jsu.getCurrentCatalog = function () {
-        return jsu._currentCatalog;
-    };
-    jsu.addTranslations = function (translations, lang) {
+        this._currentCatalog = this._translations[lang];
+    }
+    getCurrentLang () {
+        return this._currentLang;
+    }
+    getCurrentCatalog () {
+        return this._currentCatalog;
+    }
+    addTranslations (translations, lang = '') {
         // translations keys must be text or context + '\u0004' + text
         // example for translations:
         // {'text source 1': 'translated text 1', 'context\u0004text source 2': 'translated text 2'}
         let catalog;
         if (lang) {
-            if (!jsu._translations[lang]) {
-                jsu._translations[lang] = {};
+            if (!this._translations[lang]) {
+                this._translations[lang] = {};
             }
-            catalog = jsu._translations[lang];
+            catalog = this._translations[lang];
         } else {
-            catalog = jsu._currentCatalog;
+            catalog = this._currentCatalog;
         }
         for (const text of Object.keys(translations)) {
             if (translations[text]) {
@@ -614,27 +542,27 @@ if (shouldBeDefined('translate')) {
                 catalog[text] = translations[text];
             }
         }
-    };
-    jsu.translate = function (text, context) {
+    }
+    translate (text, context = '') {
         const key = (context ? context + '\u0004' : '') + text;
-        if (key in jsu._currentCatalog) {
-            return jsu._currentCatalog[key];
-        } else if (jsu._currentLang != 'en' && key in jsu._translations.en) {
-            return jsu._translations.en[key];
+        if (key in this._currentCatalog) {
+            return this._currentCatalog[key];
+        } else if (this._currentLang != 'en' && key in this._translations.en) {
+            return this._translations.en[key];
         }
         return text;
-    };
-    jsu.translateHTML = function (text, context) {
+    }
+    translateHTML (text, context = '') {
         // translate and escape text for HTML usage
-        const trans = jsu.translate(text, context);
-        return jsu.escapeHTML(trans);
-    };
-    jsu.translateAttribute = function (text, context) {
+        const trans = this.translate(text, context);
+        return this.escapeHTML(trans);
+    }
+    translateAttribute (text, context = '') {
         // translate and escape text for HTML attribute usage
-        const trans = jsu.translate(text, context);
-        return jsu.escapeAttribute(trans);
-    };
-    jsu.getDateDisplay = function (date) {
+        const trans = this.translate(text, context);
+        return this.escapeAttribute(trans);
+    }
+    getDateDisplay (date) {
         // date formats: "YYYY-MM-DDTHH:MM:SS" or "YYYY-MM-DD HH:MM:SS"
         if (!date) {
             return '';
@@ -648,18 +576,18 @@ if (shouldBeDefined('translate')) {
         // month
         let month = null;
         switch (arr[2]) {
-            case '01': month = jsu.translate('January'); break;
-            case '02': month = jsu.translate('February'); break;
-            case '03': month = jsu.translate('March'); break;
-            case '04': month = jsu.translate('April'); break;
-            case '05': month = jsu.translate('May'); break;
-            case '06': month = jsu.translate('June'); break;
-            case '07': month = jsu.translate('July'); break;
-            case '08': month = jsu.translate('August'); break;
-            case '09': month = jsu.translate('September'); break;
-            case '10': month = jsu.translate('October'); break;
-            case '11': month = jsu.translate('November'); break;
-            case '12': month = jsu.translate('December'); break;
+            case '01': month = this.translate('January'); break;
+            case '02': month = this.translate('February'); break;
+            case '03': month = this.translate('March'); break;
+            case '04': month = this.translate('April'); break;
+            case '05': month = this.translate('May'); break;
+            case '06': month = this.translate('June'); break;
+            case '07': month = this.translate('July'); break;
+            case '08': month = this.translate('August'); break;
+            case '09': month = this.translate('September'); break;
+            case '10': month = this.translate('October'); break;
+            case '11': month = this.translate('November'); break;
+            case '12': month = this.translate('December'); break;
         }
         // day
         const day = arr[3];
@@ -676,7 +604,7 @@ if (shouldBeDefined('translate')) {
             minute = '0' + minute;
         }
         let time;
-        if (jsu._currentLang !== 'en') {
+        if (this._currentLang !== 'en') {
             // 24 hours time format
             if (hour < 10) {
                 hour = '0' + hour;
@@ -698,11 +626,11 @@ if (shouldBeDefined('translate')) {
             }
             time = hour + ':' + minute + ' ' + moment;
         }
-        return day + ' ' + month + ' ' + year + ' ' + jsu.translate('at') + ' ' + time;
-    };
-    jsu.getSizeDisplay = function (value) {
+        return day + ' ' + month + ' ' + year + ' ' + this.translate('at') + ' ' + time;
+    }
+    getSizeDisplay (value) {
         if (!value || isNaN(value)) {
-            return '0 ' + jsu.translate('B');
+            return '0 ' + this.translate('B');
         }
         let unit = '';
         if (value > 1000) {
@@ -721,11 +649,9 @@ if (shouldBeDefined('translate')) {
                 }
             }
         }
-        return value.toFixed(1) + ' ' + unit + jsu.translate('B');
-    };
-}
-if (shouldBeDefined('getHashFromRequest')) {
-    jsu.getHashFromRequest = function (method, url, data, headers) {
+        return value.toFixed(1) + ' ' + unit + this.translate('B');
+    }
+    getHashFromRequest (method, url, data, headers = {}) {
         let hash = method + url;
         if (hash && hash.includes('_=')) {
             hash = hash.replace(/_=[0-9]+&?/g, '');
@@ -746,66 +672,67 @@ if (shouldBeDefined('getHashFromRequest')) {
                 hash += JSON.stringify(new Date());
             }
         }
-        if (headers) {
+        if (Object.keys(headers).length) {
             hash += JSON.stringify(headers);
         }
         return hash;
-    };
-}
-if (shouldBeDefined('xhrOverride')) {
-    jsu.xhrOverride = true;
-    // Avoid same ajax call if server doesn't respond yet
+    }
+    _overrideHttpRequest () {
+        window.xhrOverride = true;
+        // Avoid same ajax call if server doesn't respond yet
 
-    const lastsXHRCalls = [];
-    XMLHttpRequest.noIntercept = false;
+        const lastsXHRCalls = [];
+        XMLHttpRequest.noIntercept = false;
 
-    const open = XMLHttpRequest.prototype.open;
+        const open = XMLHttpRequest.prototype.open;
 
-    XMLHttpRequest.prototype.open = function (method, url) {
-        this._method = method;
-        this._url = url;
-        return open.apply(this, arguments);
-    };
+        XMLHttpRequest.prototype.open = function (method, url) {
+            this._method = method;
+            this._url = url;
+            return open.apply(this, arguments);
+        };
 
-    const setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
+        const setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
 
-    XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-        const returnData = setRequestHeader.apply(this, arguments);
+        XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
+            const returnData = setRequestHeader.apply(this, arguments);
 
-        if (!this._headers) {
-            this._headers = {};
-        }
-
-        if (!this._headers[header]) {
-            this._headers[header] = [];
-        }
-        this._headers[header].push(value);
-        return returnData;
-    };
-    const send = XMLHttpRequest.prototype.send;
-
-    XMLHttpRequest.prototype.send = function (data) {
-        const hash = jsu.getHashFromRequest(this._method, this._url, data, this._headers);
-        if (lastsXHRCalls.includes(hash)) {
-            const message = 'Duplicated request aborted';
-            Object.defineProperty(this, 'statusText', {
-                value: message,
-                writable: false
-            });
-            return this.dispatchEvent(new CustomEvent('error', {'detail': {'error': message, 'message': message}}));
-        } else {
-            lastsXHRCalls.push(hash);
-        }
-        function onReadyStateChange () {
-            if (this.readyState === XMLHttpRequest.DONE) {
-                lastsXHRCalls.splice(lastsXHRCalls.indexOf(hash), 1);
+            if (!this._headers) {
+                this._headers = {};
             }
-        }
-        if (!this.noIntercept) {
-            if (this.addEventListener) {
-                this.addEventListener('readystatechange', onReadyStateChange, false);
+
+            if (!this._headers[header]) {
+                this._headers[header] = [];
             }
-        }
-        return send.apply(this, arguments);
-    };
+            this._headers[header].push(value);
+            return returnData;
+        };
+        const send = XMLHttpRequest.prototype.send;
+
+        XMLHttpRequest.prototype.send = function (data) {
+            const hash = window.jsu.getHashFromRequest(this._method, this._url, data, this._headers);
+            if (lastsXHRCalls.includes(hash)) {
+                const message = 'Duplicated request aborted';
+                Object.defineProperty(this, 'statusText', {
+                    value: message,
+                    writable: false
+                });
+                return this.dispatchEvent(new CustomEvent('error', {'detail': {'error': message, 'message': message}}));
+            } else {
+                lastsXHRCalls.push(hash);
+            }
+            function onReadyStateChange () {
+                if (this.readyState === XMLHttpRequest.DONE) {
+                    lastsXHRCalls.splice(lastsXHRCalls.indexOf(hash), 1);
+                }
+            }
+            if (!this.noIntercept) {
+                if (this.addEventListener) {
+                    this.addEventListener('readystatechange', onReadyStateChange, false);
+                }
+            }
+            return send.apply(this, arguments);
+        };
+    }
 }
+new JavaScriptUtilities();

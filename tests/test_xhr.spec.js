@@ -2,8 +2,8 @@
 
 const assert = require('assert');
 require('./common.js');
-require('../src/jsu.js');
-const jsu = window.jsu;
+import JavaScriptUtilities from '../src/jsu.js';
+const jsu = new JavaScriptUtilities();
 
 
 describe('XHR', () => {
