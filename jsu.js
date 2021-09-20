@@ -193,7 +193,13 @@ if (shouldBeDefined('httpRequest')) {
         }
         const urlParams = [];
         for (const field in params) {
-            urlParams.push(encodeURIComponent(field) + '=' + encodeURIComponent(params[field]));
+            if (params[field] instanceof Array) {
+                for (const value of params[field]) {
+                    urlParams.push(encodeURIComponent(field) + '=' + encodeURIComponent(value));
+                }
+            } else {
+                urlParams.push(encodeURIComponent(field) + '=' + encodeURIComponent(params[field]));
+            }
         }
         if (urlParams.length > 0) {
             url += (url.indexOf('?') === -1 ? '?' : '&') + urlParams.join('&');
@@ -207,7 +213,13 @@ if (shouldBeDefined('httpRequest')) {
         } else if (args.data) {
             formData = new FormData();
             for (const field in args.data) {
-                formData.append(field, args.data[field]);
+                if (args.data[field] instanceof Array) {
+                    for (const value of args.data[field]) {
+                        formData.append(field + '[]', value);
+                    }
+                } else {
+                    formData.append(field, args.data[field]);
+                }
             }
         } else {
             formData = null;
@@ -246,8 +258,14 @@ if (shouldBeDefined('httpRequest')) {
             };
         }
         xhr.open(method, url, true);
-        for (const header in headers) {
-            xhr.setRequestHeader(header, headers[header]);
+        for (const field in headers) {
+            if (headers[field] instanceof Array) {
+                for (const value of headers[field]) {
+                    xhr.setRequestHeader(field, value);
+                }
+            } else {
+                xhr.setRequestHeader(field, headers[field]);
+            }
         }
         xhr.send(formData);
         return xhr;
