@@ -5,18 +5,15 @@ const concat = require('gulp-concat');
 const minify = require('gulp-minify');
 
 gulp.task('autobuild', function () {
-    gulp.watch('src/**', {ignoreInitial: false}, gulp.series('build'));
+    gulp.watch('src/**', {'ignoreInitial': false}, gulp.series('build'));
 });
 
 gulp.task('build', function () {
-    /* build api + trans */
-    return gulp.src([
-        'jsu.js',
-    ])
+    return gulp.src(['src/jsu.js'])
         .pipe(concat('dist/jsu.js'))
         .pipe(minify({
-            ext: { src: '.tmp.js', min: '.min.js' },
-            compress: { 'hoist_vars': true }
+            ext: {'src': '.tmp.js', 'min': '.min.js'},
+            compress: {'hoist_vars': true}
         }))
         .pipe(gulp.dest('.'));
 });
