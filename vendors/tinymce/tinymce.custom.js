@@ -28,6 +28,11 @@ function tinymce_custom_init(options) {
                 }
             });
         };
+        opt.images_upload_handler = function (blobInfo, success) {
+            const base64URI = 'data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64();
+            console.log(base64URI);
+            success(base64URI);
+        };
         tinymce.init(opt);
     });
 }
