@@ -495,10 +495,13 @@ if (shouldBeDefined('userAgent')) {
         if (window.navigator && window.navigator.userAgentData && window.navigator.userAgentData.brands) {
             for (let i = 0; i < window.navigator.userAgentData.brands.length; i++) {
                 const bd = window.navigator.userAgentData.brands[i];
-                if (bd && bd.brand.indexOf(';') == -1) {
+                if (bd) {
                     name = bd.brand.toLowerCase();
+                    if (name.indexOf('brand') != -1) {
+                        continue;
+                    }
                     version = parseFloat(bd.version);
-                    if (name == 'google chrome') {
+                    if (name == 'google chrome' || name == 'chromium') {
                         name = 'chrome';
                     } else if (name == 'microsoft edge') {
                         name = 'edge';
