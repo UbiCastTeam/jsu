@@ -15,6 +15,7 @@ function tinymce_custom_init(options) {
         opt.paste_data_images = true;
         opt.plugins = ['code codesample link lists paste help'];
         opt.fontsize_formats = '0.8em 0.9em 1em 1.2em 1.5em 2em 2.5em 3em';
+        opt.invalid_elements = 'article,section,header,footer,main';
         opt.toolbar = 'paste undo redo | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | link unlink | bullist numlist | outdent indent codesample | fontsizeselect | code removeformat | help';
         opt.browser_spellcheck = true;
         opt.setup = function (editor) {
