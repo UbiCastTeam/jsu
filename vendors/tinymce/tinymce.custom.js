@@ -15,7 +15,7 @@ function tinymce_custom_init(options) {
         opt.paste_data_images = true;
         opt.plugins = ['code codesample link lists paste help'];
         opt.fontsize_formats = '0.8em 0.9em 1em 1.2em 1.5em 2em 2.5em 3em';
-        opt.valid_elements = 'div[*],p[*],span[*],br[*],b[*],strong[*],i[*],em[*],u[*],sub[*],sup[*],a[*],ul[*],ol[*],li[*],h1[*],h2[*],h3[*],h4[*],table[*],thead[*],tbody[*],tr[*],td[*],th[*],img[*],fieldset[*],legend[*],pre[*],code[*],blockquote[*]';
+        opt.valid_elements = 'div[*],p[*],span[*],br[*],b[*],strong[*],i[*],em[*],u[*],sub[*],sup[*],a[*],ul[*],ol[*],li[*],h1[*],h2[*],h3[*],h4[*],table[*],thead[*],tbody[*],tr[*],td[*],th[*],img[*],fieldset[*],legend[*],pre[*],code[*],blockquote[*],video[*],source[*]';
         opt.toolbar = 'paste undo redo | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | link unlink | bullist numlist | outdent indent codesample | fontsizeselect | code removeformat | help';
         opt.browser_spellcheck = true;
         opt.setup = function (editor) {
