@@ -229,7 +229,7 @@ if (shouldBeDefined('httpRequest')) {
             xhr.upload.addEventListener('progress', args.progress, false);
         }
         if (args.callback) {
-            xhr.onreadystatechange = function () {
+            xhr.addEventListener('readystatechange', function () {
                 if (this.readyState !== XMLHttpRequest.DONE) {
                     return;
                 }
@@ -255,7 +255,12 @@ if (shouldBeDefined('httpRequest')) {
                     response = this.responseText;
                 }
                 args.callback(this, response);
-            };
+            });
+            xhr.addEventListener('abort', (event) => {
+                args.callback(this, {
+                    error: 'Request Aborted'
+                });
+            });
         }
         xhr.open(method, url, true);
         for (const field in headers) {
@@ -733,4 +738,61 @@ if (shouldBeDefined('translate')) {
         }
         return value.toFixed(1) + ' ' + unit + jsu.translate('B');
     };
+}
+
+function getHashFromData(method, url, data) {
+    let hash = method + url;
+    if (hash && hash.includes('_=')) {
+        hash = hash.replace(/_=[0-9]+&?/g, '');
+        if (hash.endsWith('?') || hash.endsWith('&')) {
+            hash = hash.substring(0, hash.length - 1);
+        }
+    }
+    if (data instanceof FormData) {
+        hash += JSON.stringify(Object.fromEntries(data));
+    } else if (data) {
+        hash += JSON.stringify(data);
+    }
+    return hash;
+}
+
+// Avoid same ajax call if server doesn't respond yet
+const open = XMLHttpRequest.prototype.open;
+const send = XMLHttpRequest.prototype.send;
+const lastsXHRCalls = [];
+XMLHttpRequest.noIntercept = false;
+
+XMLHttpRequest.prototype.open = function (method, url, async, user, pass) {
+    this._method = method;
+    this._url = url;
+    open.call(this, method, url, async, user, pass);
+};
+
+XMLHttpRequest.prototype.send = function (data) {
+    let oldOnReadyStateChange;
+    const hash = getHashFromData(this._method, this._url, data);
+    if (lastsXHRCalls.includes(hash)) {
+        return this.abort();
+    } else {
+        lastsXHRCalls.push(hash);
+    }
+    function onReadyStateChange () {
+        if (this.readyState === XMLHttpRequest.DONE) {
+            lastsXHRCalls.splice(lastsXHRCalls.indexOf(hash), 1);
+        }
+        if (oldOnReadyStateChange) {
+            oldOnReadyStateChange();
+        }
+    }
+
+    if (!this.noIntercept) {
+        if (this.addEventListener) {
+            this.addEventListener('readystatechange', onReadyStateChange, false);
+        } else {
+            oldOnReadyStateChange = this.onreadystatechange;
+            this.onreadystatechange = onReadyStateChange;
+        }
+    }
+
+    send.call(this, data);
 }

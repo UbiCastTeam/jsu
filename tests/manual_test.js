@@ -2,6 +2,7 @@
 * jsu: Test script                         *
 *******************************************/
 /* global jsu */
+const host = 'http://localhost:8083';
 
 function objectRepr (obj) {
     let repr = '';
@@ -135,17 +136,24 @@ function testTranslation () {
     ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
 }
 
-function testRequest (url, json) {
+function testRequest ({method, url, json, params, data, append, noText}) {
     jsu.httpRequest({
         url: url,
+        method: method,
+        params: params,
+        data: data,
         json: json,
         callback: function (req, response) {
-            const repr = 'req: ' + req + '\n' +
+            const repr = 'req: ' + url + '\n' +
                 'status: ' + req.status + '\n' +
-                'response: ' + objectRepr(response);
+                (!noText ? 'response: ' + objectRepr(response) : '');
 
             const ele = document.getElementById('requests_report');
-            ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
+            if (append) {
+                ele.innerHTML += '<p>' + jsu.escapeHTML(repr) + '</p>';
+            } else {
+                ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
+            }
         }
     });
 }
@@ -159,15 +167,63 @@ jsu.onDOMLoad(function () {
     testWebGL();
     testTranslation();
     document.getElementById('test_request_localhost_json').addEventListener('click', function () {
-        testRequest('https://localhost', true);
+        testRequest({'url': host, 'json': true});
     });
     document.getElementById('test_request_localhost_html').addEventListener('click', function () {
-        testRequest('https://localhost', false);
+        testRequest({'url': host, 'json': false});
     });
     document.getElementById('test_request_nope_json').addEventListener('click', function () {
-        testRequest('nope', true);
+        testRequest({'url': 'nope', 'json': true});
     });
     document.getElementById('test_request_nope_html').addEventListener('click', function () {
-        testRequest('nope', false);
+        testRequest({'url': 'nope', 'json': false});
+    });
+    document.getElementById('test_xhr').addEventListener('click', function () {
+        testRequest({
+            'url': host,
+            'json': true,
+            'noText': true
+        });
+        testRequest({
+            'url': host,
+            'params': {'test': 1},
+            'json': true,
+            'append': true,
+            'noText': true
+        });
+        testRequest({
+            'url': host + '?test=1&test=2',
+            'json': true,
+            'append': true,
+            'noText': true
+        });
+        testRequest({
+            'url': host + '?test=1&test=2',
+            'method': 'HEAD',
+            'json': true,
+            'append': true,
+            'noText': true
+        });
+        testRequest({
+            'url': host + '?test=1&test=2',
+            'method': 'PUT',
+            'json': true,
+            'append': true,
+            'noText': true
+        });
+        testRequest({
+            'url': host + '?test=1&test=2',
+            'method': 'POST',
+            'data': {'test': 3},
+            'json': true,
+            'append': true,
+            'noText': true
+        });
+        testRequest({
+            'url': host + '?test=1&test=2',
+            'json': true,
+            'append': true,
+            'noText': true
+        });
     });
 });
