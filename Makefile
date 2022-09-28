@@ -8,6 +8,9 @@ lint: install
 build: install
 	npm run build
 
+test: install
+	npm test
+
 stop:
 	docker container stop jsu
 
