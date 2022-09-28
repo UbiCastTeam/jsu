@@ -1,16 +1,9 @@
 /* globals require, describe, it */
 const assert = require('assert');
 window.SparkMD5 = require('spark-md5');
+require('./common.js');
 require('../src/jsu.js');
 const jsu = window.jsu;
-
-async function wait (waitFunction, ms) {
-    let retry = 0;
-    while (waitFunction() && retry < 10) {
-        await new Promise((r) => setTimeout(r, ms));
-        retry++;
-    }
-}
 
 describe('JSU', () => {
     it('should return a version', () => {
@@ -58,7 +51,7 @@ describe('JSU', () => {
         jsu.onDOMLoad(() => {
             load = true;
         });
-        await wait(() => {
+        await window.wait(() => {
             return !load;
         }, 100);
         assert(load);
@@ -85,7 +78,7 @@ describe('JSU', () => {
                 }
             });
         }
-        await wait(() => {
+        await window.wait(() => {
             return requestStatuses.length != 7;
         }, 500);
         assert(JSON.stringify(requestStatuses) == JSON.stringify([200, 200, 200, 200, 200, 200, 200]));
@@ -116,7 +109,7 @@ describe('JSU', () => {
             type: 'text/plain'
         });
         jsu.computeMD5(file, (md5Computed) => md5 = md5Computed);
-        await wait(() => {
+        await window.wait(() => {
             return !md5;
         }, 500);
         assert(md5 == '1bc29b36f623ba82aaf6724fd3b16718');
