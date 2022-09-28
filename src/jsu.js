@@ -256,7 +256,7 @@ if (shouldBeDefined('httpRequest')) {
                 }
                 args.callback(this, response);
             });
-            xhr.addEventListener('abort', (event) => {
+            xhr.addEventListener('abort', () => {
                 args.callback(this, {
                     error: 'Request Aborted'
                 });
@@ -619,7 +619,7 @@ if (shouldBeDefined('translate')) {
         } else {
             catalog = jsu._currentCatalog;
         }
-        for (const text in translations) {
+        for (const text of Object.keys(translations)) {
             if (translations[text]) {
                 // empty texts are ignored to use default texts
                 catalog[text] = translations[text];
@@ -739,23 +739,23 @@ if (shouldBeDefined('translate')) {
         return value.toFixed(1) + ' ' + unit + jsu.translate('B');
     };
 }
-
-function getHashFromData(method, url, data) {
-    let hash = method + url;
-    if (hash && hash.includes('_=')) {
-        hash = hash.replace(/_=[0-9]+&?/g, '');
-        if (hash.endsWith('?') || hash.endsWith('&')) {
-            hash = hash.substring(0, hash.length - 1);
+if (shouldBeDefined('getHashFromRequest')) {
+    jsu.getHashFromRequest = function (method, url, data) {
+        let hash = method + url;
+        if (hash && hash.includes('_=')) {
+            hash = hash.replace(/_=[0-9]+&?/g, '');
+            if (hash.endsWith('?') || hash.endsWith('&')) {
+                hash = hash.substring(0, hash.length - 1);
+            }
         }
-    }
-    if (data instanceof FormData) {
-        hash += JSON.stringify(Object.fromEntries(data));
-    } else if (data) {
-        hash += JSON.stringify(data);
-    }
-    return hash;
+        if (data instanceof FormData) {
+            hash += JSON.stringify(Object.fromEntries(data));
+        } else if (data) {
+            hash += JSON.stringify(data);
+        }
+        return hash;
+    };
 }
-
 // Avoid same ajax call if server doesn't respond yet
 const open = XMLHttpRequest.prototype.open;
 const send = XMLHttpRequest.prototype.send;
@@ -770,7 +770,7 @@ XMLHttpRequest.prototype.open = function (method, url, async, user, pass) {
 
 XMLHttpRequest.prototype.send = function (data) {
     let oldOnReadyStateChange;
-    const hash = getHashFromData(this._method, this._url, data);
+    const hash = jsu.getHashFromRequest(this._method, this._url, data);
     if (lastsXHRCalls.includes(hash)) {
         return this.abort();
     } else {
@@ -795,4 +795,4 @@ XMLHttpRequest.prototype.send = function (data) {
     }
 
     send.call(this, data);
-}
+};
