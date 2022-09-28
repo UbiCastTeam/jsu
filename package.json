@@ -19,6 +19,7 @@
     "karma-browserify": "^8.1.0",
     "karma-chai": "latest",
     "karma-chrome-launcher": "latest",
+    "karma-coverage": "^2.2.0",
     "karma-mocha": "latest",
     "karma-mocha-reporter": "^2.2.5",
     "karma-requirejs": "^1.1.0",

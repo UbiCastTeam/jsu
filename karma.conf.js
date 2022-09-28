@@ -15,6 +15,7 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
+            'src/**/*.js',
             'tests/*.spec.js'
         ],
 
@@ -27,6 +28,7 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
         preprocessors: {
+            'src/**/*.js': ['coverage'],
             'tests/*.spec.js': ['browserify']
         },
 
@@ -34,7 +36,7 @@ module.exports = function (config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://www.npmjs.com/search?q=keywords:karma-reporter
-        reporters: ['mocha'],
+        reporters: ['mocha', 'coverage'],
 
 
         // web server port
@@ -69,6 +71,10 @@ module.exports = function (config) {
 
         browserify: {
             debug: true // display file line error
+        },
+        coverageReporter: {
+            type: 'text',
+            dir: '.coverage'
         }
     });
 };
