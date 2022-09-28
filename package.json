@@ -16,16 +16,14 @@
     "gulp-concat": "latest",
     "gulp-minify": "latest",
     "karma": "latest",
-    "karma-browserify": "^8.1.0",
+    "karma-browserify": "latest",
     "karma-chai": "latest",
     "karma-chrome-launcher": "latest",
-    "karma-coverage": "^2.2.0",
+    "karma-coverage": "latest",
     "karma-mocha": "latest",
-    "karma-mocha-reporter": "^2.2.5",
-    "karma-requirejs": "^1.1.0",
-    "mocha": "latest"
-  },
-  "dependencies": {
-    "spark-md5": "^3.0.2"
+    "karma-mocha-reporter": "latest",
+    "karma-requirejs": "latest",
+    "mocha": "latest",
+    "spark-md5": "latest"
   }
 }
