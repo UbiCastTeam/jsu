@@ -25,7 +25,7 @@ if (!window.console.warn) {
 }
 
 /* ---- jsu object definition ---- */
-const VERSION = 6;
+const VERSION = 7;
 const jsu = window.jsu ? window.jsu : {version: VERSION};
 window.jsu = jsu;
 const shouldBeDefined = function (attribute) {
@@ -229,7 +229,7 @@ if (shouldBeDefined('httpRequest')) {
             xhr.upload.addEventListener('progress', args.progress, false);
         }
         if (args.callback) {
-            xhr.onreadystatechange = function () {
+            xhr.addEventListener('readystatechange', function () {
                 if (this.readyState !== XMLHttpRequest.DONE) {
                     return;
                 }
@@ -255,7 +255,12 @@ if (shouldBeDefined('httpRequest')) {
                     response = this.responseText;
                 }
                 args.callback(this, response);
-            };
+            });
+            xhr.addEventListener('abort', () => {
+                args.callback(this, {
+                    error: 'Request Aborted'
+                });
+            });
         }
         xhr.open(method, url, true);
         for (const field in headers) {
@@ -614,7 +619,7 @@ if (shouldBeDefined('translate')) {
         } else {
             catalog = jsu._currentCatalog;
         }
-        for (const text in translations) {
+        for (const text of Object.keys(translations)) {
             if (translations[text]) {
                 // empty texts are ignored to use default texts
                 catalog[text] = translations[text];
@@ -732,5 +737,93 @@ if (shouldBeDefined('translate')) {
             }
         }
         return value.toFixed(1) + ' ' + unit + jsu.translate('B');
+    };
+}
+if (shouldBeDefined('getHashFromRequest')) {
+    jsu.getHashFromRequest = function (method, url, data, headers) {
+        let hash = method + url;
+        if (hash && hash.includes('_=')) {
+            hash = hash.replace(/_=[0-9]+&?/g, '');
+            if (hash.endsWith('?') || hash.endsWith('&')) {
+                hash = hash.substring(0, hash.length - 1);
+            }
+        }
+        if (data instanceof FormData || data instanceof URLSearchParams) {
+            hash += JSON.stringify(Object.fromEntries(data));
+        } else if (data instanceof Blob) {
+            hash += 'blob-' + data.size;
+        } else if (data instanceof ArrayBuffer) {
+            hash += 'arraybuffer-' + data.byteLength;
+        } else if (data) {
+            try {
+                hash += JSON.stringify(data);
+            } catch (e) {
+                hash += JSON.stringify(new Date());
+            }
+        }
+        if (headers) {
+            hash += JSON.stringify(headers);
+        }
+        return hash;
+    };
+}
+if (shouldBeDefined('xhrOverride')) {
+    jsu.xhrOverride = true;
+    // Avoid same ajax call if server doesn't respond yet
+
+    const lastsXHRCalls = [];
+    XMLHttpRequest.noIntercept = false;
+
+    const open = XMLHttpRequest.prototype.open;
+
+    XMLHttpRequest.prototype.open = function (method, url, async, user, pass) {
+        this._method = method;
+        this._url = url;
+        open.call(this, method, url, async, user, pass);
+    };
+    const setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
+
+    XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
+        setRequestHeader.call(this, header, value);
+
+        if (!this._headers) {
+            this._headers = {};
+        }
+
+        if (!this._headers[header]) {
+            this._headers[header] = [];
+        }
+        this._headers[header].push(value);
+    };
+
+    const send = XMLHttpRequest.prototype.send;
+
+    XMLHttpRequest.prototype.send = function (data) {
+        let oldOnReadyStateChange;
+        const hash = jsu.getHashFromRequest(this._method, this._url, data, this._headers);
+        if (lastsXHRCalls.includes(hash)) {
+            return this.abort();
+        } else {
+            lastsXHRCalls.push(hash);
+        }
+        function onReadyStateChange () {
+            if (this.readyState === XMLHttpRequest.DONE) {
+                lastsXHRCalls.splice(lastsXHRCalls.indexOf(hash), 1);
+            }
+            if (oldOnReadyStateChange) {
+                oldOnReadyStateChange();
+            }
+        }
+
+        if (!this.noIntercept) {
+            if (this.addEventListener) {
+                this.addEventListener('readystatechange', onReadyStateChange, false);
+            } else {
+                oldOnReadyStateChange = this.onreadystatechange;
+                this.onreadystatechange = onReadyStateChange;
+            }
+        }
+
+        send.call(this, data);
     };
 }

@@ -1,19 +1,29 @@
 {
   "name": "jsu",
-  "version": "1.0.0",
+  "version": "7.0.0",
   "description": "",
   "main": "gulpfile.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "karma start karma.conf.js",
     "build": "gulp build",
     "lint": "eslint ."
   },
   "author": "",
   "license": "GPLv3",
-  "dependencies": {
+  "devDependencies": {
     "eslint": "latest",
     "gulp": "latest",
     "gulp-concat": "latest",
-    "gulp-minify": "latest"
+    "gulp-minify": "latest",
+    "karma": "latest",
+    "karma-browserify": "latest",
+    "karma-chai": "latest",
+    "karma-chrome-launcher": "latest",
+    "karma-coverage": "latest",
+    "karma-mocha": "latest",
+    "karma-mocha-reporter": "latest",
+    "karma-requirejs": "latest",
+    "mocha": "latest",
+    "spark-md5": "latest"
   }
 }
