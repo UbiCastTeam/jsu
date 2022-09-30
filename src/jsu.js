@@ -25,7 +25,7 @@ if (!window.console.warn) {
 }
 
 /* ---- jsu object definition ---- */
-const VERSION = 6;
+const VERSION = 7;
 const jsu = window.jsu ? window.jsu : {version: VERSION};
 window.jsu = jsu;
 const shouldBeDefined = function (attribute) {
