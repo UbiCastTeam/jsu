@@ -132,6 +132,47 @@ function testTranslation () {
         'Test trans with HTML escape: ' + assertEqual(jsu.translateHTML(label4), expected4a) + '\n' +
         'Test trans with attribute escape: ' + assertEqual(jsu.translateAttribute(label4), expected4b);
 
+    repr += '\n\nDate display, EN\n' +
+        'Current lang: ' + jsu.getCurrentLang() + '\n' +
+        '\nValid date:\n' + jsu.getDateDisplay('2022-06-20 12:23:45') +
+        '\n' + assertEqual(jsu.getDateDisplay('2022-06-20 12:23:45'), '20 June 2022 at 12:23 PM') + '\n' +
+        '\nOther valid date:\n' + jsu.getDateDisplay('2021-12-30 00:12:14') +
+        '\n' + assertEqual(jsu.getDateDisplay('2021-12-30 00:12:14'), '30 December 2021 at 12:12 AM') + '\n' +
+        '\nInvalid numbers in date:\n' + jsu.getDateDisplay('2021-19-57 69:98:84') +
+        '\n' + assertEqual(jsu.getDateDisplay('2021-19-57 69:98:84'), '2021-19-57 69:98:84') + '\n' +
+        '\nInvalid date value:\n' + jsu.getDateDisplay('Invalid') +
+        '\n' + assertEqual(jsu.getDateDisplay('Invalid'), 'Invalid') + '\n';
+
+    jsu.useLang('fr');
+    jsu.addTranslations({'at': 'à', 'June': 'juin', 'December': 'décembre'});
+    repr += '\n\nDate display, FR\n' +
+        'Current lang: ' + jsu.getCurrentLang() + '\n' +
+        '\nValid date:\n' + jsu.getDateDisplay('2022-06-20 12:23:45') +
+        '\n' + assertEqual(jsu.getDateDisplay('2022-06-20 12:23:45'), '20 juin 2022 à 12:23') + '\n' +
+        '\nOther valid date:\n' + jsu.getDateDisplay('2021-12-30 00:12:14') +
+        '\n' + assertEqual(jsu.getDateDisplay('2021-12-30 00:12:14'), '30 décembre 2021 à 00:12') + '\n' +
+        '\nInvalid numbers in date:\n' + jsu.getDateDisplay('2021-19-57 69:98:84') +
+        '\n' + assertEqual(jsu.getDateDisplay('2021-19-57 69:98:84'), '2021-19-57 69:98:84') + '\n' +
+        '\nInvalid date value:\n' + jsu.getDateDisplay('Invalid') +
+        '\n' + assertEqual(jsu.getDateDisplay('Invalid'), 'Invalid') + '\n';
+
+    jsu.useLang('en');
+    repr += '\n\nSize display, EN\n' +
+        'Current lang: ' + jsu.getCurrentLang() + '\n' +
+        '\nValid size:\n' + jsu.getSizeDisplay('123456789') +
+        '\n' + assertEqual(jsu.getSizeDisplay('123456789'), '123.5 MB') + '\n' +
+        '\nInvalid size:\n' + jsu.getSizeDisplay('abc') +
+        '\n' + assertEqual(jsu.getSizeDisplay('abc'), '0 B') + '\n';
+
+    jsu.useLang('fr');
+    jsu.addTranslations({'B': 'o'});
+    repr += '\n\nSize display, FR\n' +
+        'Current lang: ' + jsu.getCurrentLang() + '\n' +
+        '\nValid size:\n' + jsu.getSizeDisplay('123456789') +
+        '\n' + assertEqual(jsu.getSizeDisplay('123456789'), '123.5 Mo') + '\n' +
+        '\nInvalid size:\n' + jsu.getSizeDisplay('abc') +
+        '\n' + assertEqual(jsu.getSizeDisplay('abc'), '0 o') + '\n';
+
     const ele = document.getElementById('translations_report');
     ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
 }

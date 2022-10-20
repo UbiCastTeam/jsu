@@ -159,9 +159,10 @@ describe('JSU', () => {
         const translations = {
             'fr': {
                 'lang': 'fr',
-                'January': 'Janvier',
+                'June': 'juin',
+                'December': 'décembre',
                 'at': 'à',
-                'B': 'b'
+                'B': 'o'
             },
             'en': {
                 'lang': 'en',
@@ -177,11 +178,19 @@ describe('JSU', () => {
         assert(jsu.translate('lang') == 'en');
         assert(jsu.translateHTML('<p>lang</p>') == '&lt;p&gt;en&lt;/p&gt;', `${jsu.translateHTML('<p>lang</p>')} == '&lt;p&gt;en&lt;/p&gt;'`);
         assert(jsu.translateAttribute('"lang') == '&quot;en', `${jsu.translateAttribute('"lang')} == '&quot;en'`);
+        assert(jsu.getDateDisplay('2022-06-20 12:23:45') == '20 June 2022 at 12:23 PM', `${jsu.getDateDisplay('2022-06-20 12:23:45')} == '20 June 2022 at 12:23 PM'`);
+        assert(jsu.getDateDisplay('2021-12-30 00:12:14') == '30 December 2021 at 12:12 AM', `${jsu.getDateDisplay('2021-12-30 00:12:14')} == '30 December 2021 at 12:12 AM'`);
+        assert(jsu.getDateDisplay('2021-19-57 69:98:84') == '2021-19-57 69:98:84', `${jsu.getDateDisplay('2021-19-57 69:98:84')} == '2021-19-57 69:98:84'`);
+        assert(jsu.getDateDisplay('Invalid date') == 'Invalid date', `${jsu.getDateDisplay('Invalid date')} == 'Invalid date'`);
+        assert(jsu.getSizeDisplay('123456789') == '123.5 MB', `${jsu.getSizeDisplay('123456789')} ==  '123.5 MB'`);
         jsu.useLang('fr');
         assert(jsu.getCurrentLang() == 'fr');
         assert(JSON.stringify(jsu.getCurrentCatalog()) == JSON.stringify(translations['fr']));
         assert(jsu.translate('lang') == 'fr');
-        assert(jsu.getDateDisplay('2000-01-30 01:02:03') == '30 Janvier 2000 à 01h02', `${jsu.getDateDisplay('2000-01-30 01:02:03')} == '30 Janvier 2000 à 01h02'`);
-        assert(jsu.getSizeDisplay('123456789') == '123.5 Mb', `${jsu.getSizeDisplay('123456789')} ==  '123.5 Mb'`);
+        assert(jsu.getDateDisplay('2022-06-20 12:23:45') == '20 juin 2022 à 12:23', `${jsu.getDateDisplay('2022-06-20 12:23:45')} == '20 juin 2022 à 12:23'`);
+        assert(jsu.getDateDisplay('2021-12-30 00:12:14') == '30 décembre 2021 à 00:12', `${jsu.getDateDisplay('2021-12-30 00:12:14')} == '30 décembre 2021 à 00:12'`);
+        assert(jsu.getDateDisplay('2021-19-57 69:98:84') == '2021-19-57 69:98:84', `${jsu.getDateDisplay('2021-19-57 69:98:84')} == '2021-19-57 69:98:84'`);
+        assert(jsu.getDateDisplay('Invalid date') == 'Invalid date', `${jsu.getDateDisplay('Invalid date')} == 'Invalid date'`);
+        assert(jsu.getSizeDisplay('123456789') == '123.5 Mo', `${jsu.getSizeDisplay('123456789')} ==  '123.5 Mo'`);
     });
 });

@@ -650,20 +650,15 @@ if (shouldBeDefined('translate')) {
         if (!date) {
             return '';
         }
-        const dateSplit = date.replace(/(T)/g, ' ').split(' ');
-        if (dateSplit.length < 2) {
-            return '';
-        }
-        const ymdSplit = dateSplit[0].split('-');
-        const hmsSplit = dateSplit[1].split(':');
-        if (ymdSplit.length < 3 || hmsSplit.length < 3) {
-            return '';
+        const arr = (/^(\d+)-(\d+)-(\d+)(?: |T)(\d+):(\d+):(\d+)$/).exec(date);
+        if (!arr) {
+            return date;
         }
         // year
-        const year = ymdSplit[0];
+        const year = arr[1];
         // month
-        let month = ymdSplit[1];
-        switch (ymdSplit[1]) {
+        let month = null;
+        switch (arr[2]) {
             case '01': month = jsu.translate('January'); break;
             case '02': month = jsu.translate('February'); break;
             case '03': month = jsu.translate('March'); break;
@@ -678,38 +673,39 @@ if (shouldBeDefined('translate')) {
             case '12': month = jsu.translate('December'); break;
         }
         // day
-        let day;
-        try {
-            day = parseInt(ymdSplit[2], 10);
-        } catch (e) {
-            day = ymdSplit[2];
-        }
+        const day = arr[3];
         // hour
-        let hour = parseInt(hmsSplit[0], 10);
+        let hour = parseInt(arr[4], 10);
         // minute
-        let minute = parseInt(hmsSplit[1], 10);
+        let minute = parseInt(arr[5], 10);
+        // do not process invalid date
+        if (!month || isNaN(hour) || isNaN(minute)) {
+            return date;
+        }
+        // time
         if (minute < 10) {
             minute = '0' + minute;
         }
-        // time
         let time;
-        if (jsu._currentLang == 'fr') {
+        if (jsu._currentLang !== 'en') {
             // 24 hours time format
             if (hour < 10) {
                 hour = '0' + hour;
             }
-            time = hour + 'h' + minute;
+            time = hour + ':' + minute;
         } else {
             // 12 hours time format
             let moment;
-            if (hour < 13) {
+            if (hour < 12) {
                 moment = 'AM';
                 if (!hour) {
                     hour = 12;
                 }
             } else {
                 moment = 'PM';
-                hour -= 12;
+                if (hour > 12) {
+                    hour -= 12;
+                }
             }
             time = hour + ':' + minute + ' ' + moment;
         }
