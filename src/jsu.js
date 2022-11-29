@@ -772,15 +772,16 @@ if (shouldBeDefined('xhrOverride')) {
 
     const open = XMLHttpRequest.prototype.open;
 
-    XMLHttpRequest.prototype.open = function (method, url, async, user, pass) {
+    XMLHttpRequest.prototype.open = function (method, url) {
         this._method = method;
         this._url = url;
-        open.call(this, method, url, async, user, pass);
+        return open.apply(this, arguments);
     };
+
     const setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
 
     XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-        setRequestHeader.call(this, header, value);
+        const returnData = setRequestHeader.call(this, header, value);
 
         if (!this._headers) {
             this._headers = {};
@@ -790,15 +791,20 @@ if (shouldBeDefined('xhrOverride')) {
             this._headers[header] = [];
         }
         this._headers[header].push(value);
+        return returnData;
     };
-
     const send = XMLHttpRequest.prototype.send;
 
     XMLHttpRequest.prototype.send = function (data) {
         let oldOnReadyStateChange;
         const hash = jsu.getHashFromRequest(this._method, this._url, data, this._headers);
         if (lastsXHRCalls.includes(hash)) {
-            return this.abort();
+            const message = 'Duplicated request aborted';
+            Object.defineProperty(this, 'statusText', {
+                value: message,
+                writable: false
+            });
+            return this.dispatchEvent(new CustomEvent('error', {'detail': {'error': message, 'message': message}}));
         } else {
             lastsXHRCalls.push(hash);
         }
@@ -810,7 +816,6 @@ if (shouldBeDefined('xhrOverride')) {
                 oldOnReadyStateChange();
             }
         }
-
         if (!this.noIntercept) {
             if (this.addEventListener) {
                 this.addEventListener('readystatechange', onReadyStateChange, false);
@@ -819,7 +824,6 @@ if (shouldBeDefined('xhrOverride')) {
                 this.onreadystatechange = onReadyStateChange;
             }
         }
-
-        send.call(this, data);
+        return send.apply(this, arguments);
     };
 }
