@@ -49,18 +49,28 @@ describe('XHR', () => {
     it('should block identical request', async () => {
         const testDatas = [
             {'method': 'GET'},
+            {'method': 'GET'},
+            {'method': 'GET', 'params': {'test': 1}},
             {'method': 'GET', 'params': {'test': 1}},
             {'method': 'GET', 'params': {'test': 1}, 'headers': {'test': 2}},
+            {'method': 'GET', 'params': {'test': 1}, 'headers': {'test': 2}},
+            {'method': 'POST', 'data': {'test': 1}},
             {'method': 'POST', 'data': {'test': 1}},
             {'method': 'POST', 'params': {'test': 1}, 'data': {'test': 1}},
             {'method': 'POST', 'params': {'test': 1}, 'data': {'test': 1}}, // should be ignored
             {'method': 'PUT', 'data': {'test': 1}},
+            {'method': 'PUT', 'data': {'test': 1}},
+            {'method': 'DELETE', 'data': {'test': 1}},
             {'method': 'DELETE', 'data': {'test': 1}},
             {'method': 'PATCH', 'data': {'test': 1}},
+            {'method': 'PATCH', 'data': {'test': 1}},
             {'method': 'HEAD'},
+            {'method': 'HEAD'},
+            {'method': 'OPTIONS'},
             {'method': 'OPTIONS'}
         ];
         const requestResults = [];
+        const errorResults = [];
         for (const testData of testDatas) {
             jsu.httpRequest({
                 'url': 'http://localhost:9876',
@@ -68,8 +78,12 @@ describe('XHR', () => {
                 'params': testData.params,
                 'data': testData.data,
                 'headers': testData.headers,
-                'callback': function (req) {
-                    requestResults.push(req.status);
+                'callback': function (xhr) {
+                    if (xhr.status !== 0) {
+                        requestResults.push(xhr.status);
+                    } else {
+                        errorResults.push(xhr.status);
+                    }
                 }
             });
         }
@@ -78,8 +92,30 @@ describe('XHR', () => {
         }, 500);
         assert(requestResults.length == 10, `${requestResults.length} == 10`);
         const correctResults = [200, 200, 200, 200, 200, 200, 200, 200, 200, 200];
+        const correctErrorResults = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        assert(
+            JSON.stringify(requestResults) == JSON.stringify(correctResults),
+            `${JSON.stringify(requestResults)} == ${JSON.stringify(correctResults)}`);
+        assert(
+            JSON.stringify(errorResults) == JSON.stringify(correctErrorResults),
+            `${JSON.stringify(errorResults)} == ${JSON.stringify(correctErrorResults)}`);
+    }).timeout(5000);
+    it('should trigger on abort', async () => {
+        const requestResults = [];
+        const xhrRequest = jsu.httpRequest({
+            'url': 'http://localhost:9876',
+            'callback': function (xhr) {
+                requestResults.push(xhr.status);
+            }
+        });
+        xhrRequest.abort();
+        await window.wait(() => {
+            return requestResults.length != 1;
+        }, 500);
+        const correctResults = [0];
         assert(
             JSON.stringify(requestResults) == JSON.stringify(correctResults),
             `${JSON.stringify(requestResults)} == ${JSON.stringify(correctResults)}`);
     }).timeout(5000);
+
 });

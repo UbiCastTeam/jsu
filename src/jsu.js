@@ -254,12 +254,21 @@ if (shouldBeDefined('httpRequest')) {
                 } else {
                     response = this.responseText;
                 }
-                args.callback(this, response);
+                if (!xhr._callbackCalled) {
+                    xhr._callbackCalled = true;
+                    args.callback(this, response);
+                }
             });
-            xhr.addEventListener('abort', () => {
-                args.callback(this, {
-                    error: 'Request Aborted'
-                });
+            xhr.addEventListener('error', function (event) {
+                const errorMessage = event.error ||
+                    event.message ||
+                    (event.detail ? event.detail.error || event.detail.message : 'Unknown error');
+                if (!xhr._callbackCalled) {
+                    xhr._callbackCalled = true;
+                    args.callback(this, {
+                        error: errorMessage
+                    });
+                }
             });
         }
         xhr.open(method, url, true);
@@ -781,7 +790,7 @@ if (shouldBeDefined('xhrOverride')) {
     const setRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
 
     XMLHttpRequest.prototype.setRequestHeader = function (header, value) {
-        const returnData = setRequestHeader.call(this, header, value);
+        const returnData = setRequestHeader.apply(this, arguments);
 
         if (!this._headers) {
             this._headers = {};
