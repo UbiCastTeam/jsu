@@ -178,11 +178,31 @@ describe('JSU', () => {
         assert(jsu.translate('lang') == 'en');
         assert(jsu.translateHTML('<p>lang</p>') == '&lt;p&gt;en&lt;/p&gt;', `${jsu.translateHTML('<p>lang</p>')} == '&lt;p&gt;en&lt;/p&gt;'`);
         assert(jsu.translateAttribute('"lang') == '&quot;en', `${jsu.translateAttribute('"lang')} == '&quot;en'`);
-        assert(jsu.getDateDisplay('2022-06-20 12:23:45') == '20 June 2022 at 12:23 PM', `${jsu.getDateDisplay('2022-06-20 12:23:45')} == '20 June 2022 at 12:23 PM'`);
+        assert(jsu.getDateDisplay('') == '');
+        const months = {
+            '01': 'January',
+            '02': 'February',
+            '03': 'March',
+            '04': 'April',
+            '05': 'May',
+            '06': 'June',
+            '07': 'July',
+            '08': 'August',
+            '09': 'September',
+            '10': 'October',
+            '11': 'November',
+            '12': 'December'
+        };
+        for (const key of Object.keys(months)) {
+            assert(jsu.getDateDisplay(`2022-${key}-20 13:03:45`) == `20 ${months[key]} 2022 at 1:03 PM`, `${jsu.getDateDisplay('2022-' + key + '-20 13:03:45')} == '20 ${months[key]} 2022 at 1:03 PM'`);
+        }
         assert(jsu.getDateDisplay('2021-12-30 00:12:14') == '30 December 2021 at 12:12 AM', `${jsu.getDateDisplay('2021-12-30 00:12:14')} == '30 December 2021 at 12:12 AM'`);
         assert(jsu.getDateDisplay('2021-19-57 69:98:84') == '2021-19-57 69:98:84', `${jsu.getDateDisplay('2021-19-57 69:98:84')} == '2021-19-57 69:98:84'`);
         assert(jsu.getDateDisplay('Invalid date') == 'Invalid date', `${jsu.getDateDisplay('Invalid date')} == 'Invalid date'`);
+        assert(jsu.getSizeDisplay() == '0 B', `${jsu.getSizeDisplay()} ==  '0 B'`);
         assert(jsu.getSizeDisplay('123456789') == '123.5 MB', `${jsu.getSizeDisplay('123456789')} ==  '123.5 MB'`);
+        assert(jsu.getSizeDisplay('12345678910') == '12.3 GB', `${jsu.getSizeDisplay('12345678910')} ==  '123.5 MB'`);
+        assert(jsu.getSizeDisplay('1234567891011') == '1.2 TB', `${jsu.getSizeDisplay('1234567891011')} ==  '123.5 MB'`);
         jsu.useLang('fr');
         assert(jsu.getCurrentLang() == 'fr');
         assert(JSON.stringify(jsu.getCurrentCatalog()) == JSON.stringify(translations['fr']));
@@ -192,5 +212,7 @@ describe('JSU', () => {
         assert(jsu.getDateDisplay('2021-19-57 69:98:84') == '2021-19-57 69:98:84', `${jsu.getDateDisplay('2021-19-57 69:98:84')} == '2021-19-57 69:98:84'`);
         assert(jsu.getDateDisplay('Invalid date') == 'Invalid date', `${jsu.getDateDisplay('Invalid date')} == 'Invalid date'`);
         assert(jsu.getSizeDisplay('123456789') == '123.5 Mo', `${jsu.getSizeDisplay('123456789')} ==  '123.5 Mo'`);
+        jsu.useLang('x');
+        assert(jsu.translate('lang') == 'en');
     });
 });

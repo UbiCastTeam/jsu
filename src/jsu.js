@@ -233,6 +233,10 @@ if (shouldBeDefined('httpRequest')) {
                 if (this.readyState !== XMLHttpRequest.DONE) {
                     return;
                 }
+                if (xhr._callbackCalled) {
+                    return;
+                }
+                xhr._callbackCalled = true;
                 let response;
                 if (args.json) {
                     if (this.responseText === '') {
@@ -254,21 +258,19 @@ if (shouldBeDefined('httpRequest')) {
                 } else {
                     response = this.responseText;
                 }
-                if (!xhr._callbackCalled) {
-                    xhr._callbackCalled = true;
-                    args.callback(this, response);
-                }
+                args.callback(this, response);
             });
             xhr.addEventListener('error', function (event) {
+                if (xhr._callbackCalled) {
+                    return;
+                }
+                xhr._callbackCalled = true;
                 const errorMessage = event.error ||
                     event.message ||
                     (event.detail ? event.detail.error || event.detail.message : 'Unknown error');
-                if (!xhr._callbackCalled) {
-                    xhr._callbackCalled = true;
-                    args.callback(this, {
-                        error: errorMessage
-                    });
-                }
+                args.callback(this, {
+                    error: errorMessage
+                });
             });
         }
         xhr.open(method, url, true);
@@ -805,7 +807,6 @@ if (shouldBeDefined('xhrOverride')) {
     const send = XMLHttpRequest.prototype.send;
 
     XMLHttpRequest.prototype.send = function (data) {
-        let oldOnReadyStateChange;
         const hash = jsu.getHashFromRequest(this._method, this._url, data, this._headers);
         if (lastsXHRCalls.includes(hash)) {
             const message = 'Duplicated request aborted';
@@ -821,16 +822,10 @@ if (shouldBeDefined('xhrOverride')) {
             if (this.readyState === XMLHttpRequest.DONE) {
                 lastsXHRCalls.splice(lastsXHRCalls.indexOf(hash), 1);
             }
-            if (oldOnReadyStateChange) {
-                oldOnReadyStateChange();
-            }
         }
         if (!this.noIntercept) {
             if (this.addEventListener) {
                 this.addEventListener('readystatechange', onReadyStateChange, false);
-            } else {
-                oldOnReadyStateChange = this.onreadystatechange;
-                this.onreadystatechange = onReadyStateChange;
             }
         }
         return send.apply(this, arguments);
