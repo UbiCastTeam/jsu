@@ -9,7 +9,7 @@
     "lint": "eslint ."
   },
   "author": "",
-  "license": "GPLv3",
+  "license": "LGPLv3",
   "devDependencies": {
     "eslint": "latest",
     "gulp": "latest",
