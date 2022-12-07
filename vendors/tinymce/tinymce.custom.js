@@ -44,8 +44,8 @@ window.tinymceCustomInit = function (options) {
             'convert_urls': false,
             'paste_data_images': true,
             'plugins': ['code', 'codesample', 'link', 'lists', 'help'],
-            'fontsize_formats': '0.8em 0.9em 1em 1.2em 1.5em 2em 2.5em 3em',
-            'toolbar': 'paste undo redo | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | link unlink | bullist numlist | outdent indent codesample | fontsizeselect | code removeformat | help',
+            'font_size_formats': '80%=0.8em 100%=1em 120%=1.2em 150%=1.5em 200%=2em 250%=2.5em 300%=3em',
+            'toolbar': 'paste undo redo | fontsize bold italic underline strikethrough | link unlink | bullist numlist | alignleft aligncenter alignright alignjustify | outdent indent codesample | fontsizeselect | code removeformat | help',
             'browser_spellcheck': true,
             'setup': function (editor) {
                 editor.on('init', function () {
