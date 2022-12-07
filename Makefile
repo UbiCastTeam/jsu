@@ -1,12 +1,14 @@
+DOCKER_IMAGE_NAME ?= jsu-docker-image
+
 build_docker_img:
-	docker build --tag jsu-docker-image .
+	docker build --tag ${DOCKER_IMAGE_NAME} .
 
 install:
 	npm install
 
 lint:
 ifndef IN_DOCKER
-	docker run --rm -v ${CURDIR}:/apps jsu-docker-image make lint
+	docker run -it --rm -v ${CURDIR}:/apps ${DOCKER_IMAGE_NAME} make lint
 else
 	$(MAKE) install
 	npm run lint
@@ -14,7 +16,7 @@ endif
 
 build:
 ifndef IN_DOCKER
-	docker run --rm -v ${CURDIR}:/apps jsu-docker-image make build
+	docker run -it --rm -v ${CURDIR}:/apps ${DOCKER_IMAGE_NAME} make build
 else
 	$(MAKE) install
 	npm run build
@@ -22,14 +24,11 @@ endif
 
 test:
 ifndef IN_DOCKER
-	docker run --rm --privileged -v ${CURDIR}:/apps jsu-docker-image make test
+	docker run -it --rm --privileged -v ${CURDIR}:/apps ${DOCKER_IMAGE_NAME} make test
 else
 	$(MAKE) install
 	npm test
 endif
 
-stop:
-	docker container stop jsu
-
 run:
-	docker run -dit --rm --name jsu -p 8083:80 -v ${PWD}:/usr/local/apache2/htdocs/ httpd:2.4
+	docker run -it --rm --name jsu-httpd -p 8083:80 -v ${PWD}:/usr/local/apache2/htdocs/ httpd:2.4
