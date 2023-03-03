@@ -115,7 +115,7 @@ function testTranslation () {
         'Current lang: ' + jsu.getCurrentLang() + '\n' +
         jsu.translate(label3) + '\n' +
         'Test lang: ' + assertEqual(jsu.getCurrentLang(), 'fr') + '\n' +
-        'Test trans with context: ' + assertEqual(jsu.translate(label3, 'test context'), expected3);
+        'Test trans with context: ' + assertEqual(jsu.translate(label3, {'context': 'test context'}), expected3);
 
     const label4 = 'test label 4 <"test">';
     const data4 = {};

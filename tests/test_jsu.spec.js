@@ -215,4 +215,50 @@ describe('JSU', () => {
         jsu.useLang('x');
         assert(jsu.translate('lang') == 'en');
     });
+    it('should translate with options', () => {
+        const translations = {
+            'fr': {
+                'test ${n} test': 'test fr ${n} test fr',
+                'context\u0004test ${n} test': 'context_test fr ${n} test fr',
+            },
+            'en': {
+                'test only in en ${n}': 'test en ${n}',
+                'test ${n} test': 'test en ${n} test en'
+            }
+        };
+        jsu.addTranslations(translations['en'], 'en');
+        jsu.addTranslations(translations['fr'], 'fr');
+
+        assert(
+            jsu.translate('test ${n} test', {'formatValues': {'n': 1}}) == 'test en 1 test en',
+            `${jsu.translate('test ${n} test', {'formatValues': {'n': 1}})} == 'test en 1 test en'`
+        );
+
+        jsu.useLang('fr');
+
+        assert(
+            jsu.translate('test ${n} test', {'formatValues': {'n': 1}}) == 'test fr 1 test fr',
+            `${jsu.translate('test ${n} test', {'formatValues': {'n': 1}})} == 'test fr 1 test fr'`
+        );
+        assert(
+            jsu.translate('test ${n} test', {'context': 'context', 'formatValues': {'n': 1}}) == 'context_test fr 1 test fr',
+            `${jsu.translate('test ${n} test', {'context': 'context', 'formatValues': {'n': 1}})} == 'context_test fr 1 test fr'`
+        );
+        assert(
+            jsu.translate('test only in en ${n}', {'formatValues': {'n': 1}}) == 'test en 1',
+            `${jsu.translate('test ${n}', {'formatValues': {'n': 1}})} == 'test en 1'`
+        );
+        assert(
+            jsu.translate('test ${n}', {'formatValues': {'n': 1}}) == 'test 1',
+            `${jsu.translate('test ${n}', {'formatValues': {'n': 1}})} == 'test 1'`
+        );
+        assert(
+            jsu.translateHTML('test ${n} test', {'formatValues': {'n': 1}}) == 'test fr 1 test fr',
+            `${jsu.translateHTML('test ${n} test', {'formatValues': {'n': 1}})} == 'test fr 1 test fr'`
+        );
+        assert(
+            jsu.translateAttribute('test ${n} test', {'formatValues': {'n': 1}}) == 'test fr 1 test fr',
+            `${jsu.translateAttribute('test ${n} test', {'formatValues': {'n': 1}})} == 'test fr 1 test fr'`
+        );
+    });
 });

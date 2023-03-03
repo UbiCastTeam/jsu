@@ -638,23 +638,28 @@ if (shouldBeDefined('translate')) {
             }
         }
     };
-    jsu.translate = function (text, context) {
-        const key = (context ? context + '\u0004' : '') + text;
+    jsu.translate = function (text, options) {
+        const key = (options && options.context ? options.context + '\u0004' : '') + text;
         if (key in jsu._currentCatalog) {
-            return jsu._currentCatalog[key];
+            text = jsu._currentCatalog[key];
         } else if (jsu._currentLang != 'en' && key in jsu._translations.en) {
-            return jsu._translations.en[key];
+            text = jsu._translations.en[key];
+        }
+        if (options && options.formatValues) {
+            for (const key of Object.keys(options.formatValues)) {
+                text = text.replace('${' + key + '}', options.formatValues[key]);
+            }
         }
         return text;
     };
-    jsu.translateHTML = function (text, context) {
+    jsu.translateHTML = function (text, options) {
         // translate and escape text for HTML usage
-        const trans = jsu.translate(text, context);
+        const trans = jsu.translate(text, options);
         return jsu.escapeHTML(trans);
     };
-    jsu.translateAttribute = function (text, context) {
+    jsu.translateAttribute = function (text, options) {
         // translate and escape text for HTML attribute usage
-        const trans = jsu.translate(text, context);
+        const trans = jsu.translate(text, options);
         return jsu.escapeAttribute(trans);
     };
     jsu.getDateDisplay = function (date) {
