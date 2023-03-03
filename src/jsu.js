@@ -172,6 +172,7 @@ if (shouldBeDefined('httpRequest')) {
             params: {},
             data: {},
             cache: false,
+            synchronous: false,
             json: false,
             jsonData: false,
             progress: function (event) {},
@@ -273,7 +274,7 @@ if (shouldBeDefined('httpRequest')) {
                 });
             });
         }
-        xhr.open(method, url, true);
+        xhr.open(method, url, !args.synchronous);
         for (const field in headers) {
             if (headers[field] instanceof Array) {
                 for (const value of headers[field]) {
