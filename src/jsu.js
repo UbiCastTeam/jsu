@@ -599,6 +599,16 @@ if (shouldBeDefined('userAgent')) {
     jsu._getBrowserInfo();
 }
 
+if (shouldBeDefined('isRecordingAvailable')) {
+    jsu.isRecordingAvailable = function () {
+        const isFirefoxCompat = jsu.browserName === 'firefox' && jsu.browserVersion >= 45;
+        const isChromeCompat = (jsu.browserName === 'chrome' || jsu.browserName === 'chromium') && jsu.browserVersion >= 57;
+        const isEdgeCompat = jsu.browserName === 'edge' && jsu.browserVersion >= 79;
+        return isFirefoxCompat ||
+               isChromeCompat ||
+               isEdgeCompat;
+    };
+}
 
 /* Translations related functions */
 if (shouldBeDefined('translate')) {

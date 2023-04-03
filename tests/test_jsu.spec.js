@@ -155,6 +155,23 @@ describe('JSU', () => {
         assert(jsu.browserName);
         assert(jsu.browserVersion);
     });
+    it('should test isRecordingAvailable', () => {
+        const data = [
+            ['safari', '6', false],
+            ['firefox', '30', false],
+            ['chrome', '30', false],
+            ['chromium', '30', false],
+            ['edge', '30', false],
+            ['firefox', '100', true],
+            ['chrome', '100', true],
+            ['edge', '100', true]
+        ];
+        for (const [browserName, browserVersion, result] of data) {
+            jsu.browserName = browserName;
+            jsu.browserVersion = browserVersion;
+            assert(jsu.isRecordingAvailable() === result, `${browserName}@${browserVersion} isRecordingAvailable ${jsu.isRecordingAvailable()}`);
+        }
+    });
     it('should manage translations', () => {
         const translations = {
             'fr': {
