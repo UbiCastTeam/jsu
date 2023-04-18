@@ -8,6 +8,8 @@ Some other common JavaScript modules are shipped with this project. Use the `min
 
 Please use `eslint` to clean the code using the guidelines specified in the `.eslintrc.json` file.
 
+Use the `make lint` command to check your code before pushing it.
+
 ## History
 
 This project is a refactoring of utils.js:

@@ -1,34 +1,34 @@
-DOCKER_IMAGE_NAME ?= jsu-docker-image
+DOCKER_IMAGE_NAME ?= jsu-image
+DOCKER_RUN ?= docker run \
+	--name jsu-container \
+	--workdir /apps \
+	--mount type=bind,src=${PWD},dst=/apps \
+	--user "$(shell id -u):$(shell id -g)" \
+	--rm -it
 
-build_docker_img:
+docker_build:
 	docker build --tag ${DOCKER_IMAGE_NAME} .
 
-install:
-	npm install
+docker_rebuild:
+	docker build --no-cache -t ${DOCKER_IMAGE_NAME} .
 
 lint:
-ifndef IN_DOCKER
-	docker run -it --rm -v ${CURDIR}:/apps ${DOCKER_IMAGE_NAME} make lint
-else
-	$(MAKE) install
+	${DOCKER_RUN} ${DOCKER_IMAGE_NAME} make lint_local
+
+lint_local:
 	npm run lint
-endif
 
 build:
-ifndef IN_DOCKER
-	docker run -it --rm -v ${CURDIR}:/apps ${DOCKER_IMAGE_NAME} make build
-else
-	$(MAKE) install
+	${DOCKER_RUN} ${DOCKER_IMAGE_NAME} make build_local
+
+build_local:
 	npm run build
-endif
 
 test:
-ifndef IN_DOCKER
-	docker run -it --rm --privileged -v ${CURDIR}:/apps ${DOCKER_IMAGE_NAME} make test
-else
-	$(MAKE) install
+	${DOCKER_RUN} --privileged ${DOCKER_IMAGE_NAME} make test_local
+
+test_local:
 	npm test
-endif
 
 run:
 	docker run -it --rm --name jsu-httpd -p 8083:80 -v ${PWD}:/usr/local/apache2/htdocs/ httpd:2.4
