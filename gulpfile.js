@@ -9,7 +9,7 @@ gulp.task('autobuild', function () {
 });
 
 gulp.task('build', function () {
-    return gulp.src(['src/jsu.js'])
+    return gulp.src(['src/jsu.js', 'src/lib/*.js'])
         .pipe(concat('dist/jsu.js'))
         .pipe(minify({
             ext: {'src': '.tmp.js', 'min': '.min.js'},

@@ -1,13 +1,12 @@
 /* globals require, describe, it */
 const assert = require('assert');
-window.SparkMD5 = require('spark-md5');
 require('./common.js');
 require('../src/jsu.js');
 const jsu = window.jsu;
 
 describe('JSU', () => {
-    it('should return a version', () => {
-        assert(jsu.version == 7);
+    it('should return correct version', () => {
+        assert(jsu.version === 8);
     });
     it('should set/get cookies', () => {
         jsu.setCookie('a', '1');
@@ -102,17 +101,6 @@ describe('JSU', () => {
         assert(!obj.a);
         assert(!obj.translations);
         assert(obj.b);
-    });
-    it('should computeMD5', async () => {
-        let md5 = null;
-        const file = new File(['md5'], 'md5.txt', {
-            type: 'text/plain'
-        });
-        jsu.computeMD5(file, (md5Computed) => md5 = md5Computed);
-        await window.wait(() => {
-            return !md5;
-        }, 500);
-        assert(md5 == '1bc29b36f623ba82aaf6724fd3b16718');
     });
     it('should getWebglContext', () => {
         const testDatas = [
