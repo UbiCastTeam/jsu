@@ -25,7 +25,7 @@ if (!window.console.warn) {
 }
 
 /* ---- jsu object definition ---- */
-const VERSION = 7;
+const VERSION = 8;
 const jsu = window.jsu ? window.jsu : {version: VERSION};
 window.jsu = jsu;
 const shouldBeDefined = function (attribute) {
@@ -324,46 +324,6 @@ if (shouldBeDefined('setObjectAttributes')) {
                 obj[attr] = data[attr];
             }
         }
-    };
-}
-
-if (shouldBeDefined('computeMD5')) {
-    jsu.computeMD5 = function (file, callback, progressCallback) {
-        // MD5 sum computation (requires the SparkMD5 library)
-        if (!window.File) {
-            return callback('unsupported');
-        }
-        if (!window.SparkMD5) {
-            console.warn('MD5 computation failed because SparkMD5 is not available.');
-            return callback('unsupported');
-        }
-        const blobSlice = window.File.prototype.slice || window.File.prototype.mozSlice || window.File.prototype.webkitSlice;
-        const spark = new window.SparkMD5.ArrayBuffer();
-        const fileReader = new FileReader();
-        const chunkSize = 2097152; // Read in chunks of 2MB
-        const chunks = Math.ceil(file.size / chunkSize);
-        let currentChunk = 0;
-        const loadNext = function () {
-            const start = currentChunk * chunkSize;
-            const end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-            fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
-        };
-        fileReader.onload = function (e) {
-            spark.append(e.target.result); // Append array buffer
-            currentChunk++;
-            if (progressCallback) {
-                progressCallback(Math.min(currentChunk * chunkSize, file.size) / file.size);
-            }
-            if (currentChunk < chunks) {
-                loadNext();
-            } else {
-                callback(spark.end());
-            }
-        };
-        fileReader.onerror = function () {
-            console.warn('MD5 computation failed');
-        };
-        loadNext();
     };
 }
 

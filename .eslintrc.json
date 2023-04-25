@@ -29,11 +29,10 @@
     },
     "env": {
         "browser": true,
-        "jquery": true,
         "es6": true
     },
     "parserOptions": {
         "sourceType": "module",
-        "ecmaVersion": 8
+        "ecmaVersion": 2022
     }
 }

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Manual upload test page</title>
+
+    <script type="text/javascript" src="../../src/jsu.js"></script>
+    <script type="text/javascript" src="../../src/lib/chunked-upload.js"></script>
+
+    <script type="text/javascript" src="upload-config.tmp.js">
+        /*
+        Put your custom test configration in this file which will not be committed.
+        The configration must declare the "config" variable.
+        For example:
+        ```
+        const config = {
+            uploadURL: 'https://example.com/api/v2/upload/',
+            completeURL: 'https://example.com/api/v2/upload/complete/',
+            extraHheaders: {
+                'Api-Key': 'Test'
+            },
+            fileNameSuffix: '_suffix',
+            retryCallback: function (xhr) {
+                console.warn('Failed request to retry:', xhr);
+                return new Promise(function (resolve) {
+                    resolve(alert('Press OK to retry.'));
+                });
+            }
+        };
+        ```
+        */
+    </script>
+
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const options = Object.assign({
+                uploadURL: '/api/v2/upload/',
+                completeURL: '/api/v2/upload/complete/',
+                progressCallback: function (progress) {
+                    document.getElementById('id_progress').value = progress;
+                },
+                successCallback: function (uploadID) {
+                    document.getElementById('id_upload_id').value = uploadID;
+                    document.getElementById('id_messages').textContent = 'Upload succeeded.';
+                },
+                failureCallback: function (message) {
+                    document.getElementById('id_messages').textContent = message;
+                }
+            }, config);
+            document.getElementById('id_form').addEventListener('submit', function (event) {
+                event.preventDefault();
+                options.file =  document.getElementById('id_file').files[0];
+                new ChunkedUpload(options);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Manual upload test page</h1>
+    <form id="id_form" method="GET" action="#">
+        <div>
+            <label for="id_file">File:</label>
+            <input type="file" id="id_file" name="file" required/>
+            <div>
+                <progress id="id_progress" min="0" max="100" value="0"></progress>
+                <input type="text" id="id_upload_id" name="upload_id"/>
+                <div id="id_messages"></div>
+            </div>
+        </div>
+        <div>
+            <button type="submit">Send file</button>
+        </div>
+    </form>
+</body>
+</html>

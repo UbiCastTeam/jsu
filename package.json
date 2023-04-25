@@ -1,6 +1,6 @@
 {
   "name": "jsu",
-  "version": "7.0.0",
+  "version": "8",
   "description": "",
   "main": "gulpfile.js",
   "scripts": {
@@ -23,7 +23,6 @@
     "karma-mocha": "latest",
     "karma-mocha-reporter": "latest",
     "karma-requirejs": "latest",
-    "mocha": "latest",
-    "spark-md5": "latest"
+    "mocha": "latest"
   }
 }
