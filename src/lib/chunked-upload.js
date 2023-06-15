@@ -176,8 +176,12 @@ class ChunkedUpload {
                         self.sendNextChunk(nextStart, 0);
                     }
                 } else {
-                    self.log('Failed to send chunk:', response);
+                    console.error('Failed to send chunk:', response);
                     if (retries < self.maxRetry) {
+                        if (response.offset !== undefined && start !== response.offset) {
+                            console.warn('Jumping from offset ' + start + ' to ' + response.offset);
+                            start = response.offset;
+                        }
                         self.onRetry(xhr, self.sendNextChunk.bind(self, start, retries + 1));
                     } else {
                         self.onFailure(response.error);
@@ -210,7 +214,7 @@ class ChunkedUpload {
                     self.onProgress(100);
                     self.onSuccess();
                 } else {
-                    self.log('Failed to call complete:', response);
+                    console.error('Failed to call complete:', response);
                     if (retries < self.maxRetry) {
                         self.onRetry(xhr, self.completeUpload.bind(self, retries + 1));
                     } else {
