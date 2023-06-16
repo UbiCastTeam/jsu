@@ -29,16 +29,16 @@ describe('JSU', () => {
         assert(value == 'test');
     });
     it('should escapeHTML and decodeHTML', () => {
-        const html = '<div class="test">test</div>';
+        const html = '<div class="test">test &#34;</div>';
         const encodedHTML = jsu.escapeHTML(html);
-        assert(encodedHTML == '&lt;div class=&quot;test&quot;&gt;test&lt;/div&gt;');
+        assert(encodedHTML == '&lt;div class="test"&gt;test &amp;#34;&lt;/div&gt;');
         const decodedHTML = jsu.decodeHTML(encodedHTML);
         assert(decodedHTML == html);
     });
-    it('should escapeHTML and decodeHTML', () => {
-        const html = '<div class="test">test</div>';
+    it('should escapeAttribute', () => {
+        const html = '<div class="test">test\n\'</div>';
         const encodedHTML = jsu.escapeAttribute(html);
-        assert(encodedHTML == '<div class=&quot;test&quot;>test</div>');
+        assert(encodedHTML == '<div class=&quot;test&quot;>test&#13;&#10;&#39;</div>');
     });
     it('should getClickPosition', () => {
         const evt = {'pageX': 10, 'pageY': 10};

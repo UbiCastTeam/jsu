@@ -119,10 +119,10 @@ if (shouldBeDefined('escapeHTML')) {
             return text;
         }
         let result = text.toString();
+        result = result.replace(/(&)/g, '&amp;');
         result = result.replace(/(<)/g, '&lt;');
         result = result.replace(/(>)/g, '&gt;');
         result = result.replace(/(\n)/g, '<br/>');
-        result = result.replace(/(")/g, '&quot;');
         return result;
     };
 }
@@ -132,8 +132,9 @@ if (shouldBeDefined('escapeAttribute')) {
             return attr;
         }
         let result = attr.toString();
-        result = result.replace(/(\n)/g, '&#13;&#10;');
         result = result.replace(/(")/g, '&quot;');
+        result = result.replace(/(')/g, '&#39;');
+        result = result.replace(/(\n)/g, '&#13;&#10;');
         return result;
     };
 }
