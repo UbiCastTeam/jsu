@@ -28,7 +28,7 @@ class ChunkedUpload {
             'extraData': {},
 
             // Integer. Maximal number of retry for requests.
-            'maxRetry': 5,
+            'maxRetry': 30,
 
             // Integer. Delay in ms to wait before retrying a request. Default: 10 s.
             'retryDelay': 10000,
