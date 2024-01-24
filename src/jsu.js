@@ -570,7 +570,14 @@ if (shouldBeDefined('isRecordingAvailable')) {
                isEdgeCompat;
     };
 }
-
+if (shouldBeDefined('isLivestreamingAvailable')) {
+    jsu.isLivestreamingAvailable = function () {
+        const isChromeCompat = (jsu.browserName === 'chrome' || jsu.browserName === 'chromium') && jsu.browserVersion >= 57;
+        const isEdgeCompat = jsu.browserName === 'edge' && jsu.browserVersion >= 79;
+        return isChromeCompat ||
+               isEdgeCompat;
+    };
+}
 /* Translations related functions */
 if (shouldBeDefined('translate')) {
     jsu._translations = { en: {} };
