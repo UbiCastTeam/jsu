@@ -564,18 +564,17 @@ if (shouldBeDefined('isRecordingAvailable')) {
     jsu.isRecordingAvailable = function () {
         const isFirefoxCompat = jsu.browserName === 'firefox' && jsu.browserVersion >= 45;
         const isChromeCompat = (jsu.browserName === 'chrome' || jsu.browserName === 'chromium') && jsu.browserVersion >= 57;
+        const isSafariCompat = jsu.browserName === 'safari' && jsu.browserVersion >= 16;
         const isEdgeCompat = jsu.browserName === 'edge' && jsu.browserVersion >= 79;
-        return isFirefoxCompat ||
-               isChromeCompat ||
-               isEdgeCompat;
+        return isFirefoxCompat || isSafariCompat || isChromeCompat || isEdgeCompat;
     };
 }
 if (shouldBeDefined('isLivestreamingAvailable')) {
     jsu.isLivestreamingAvailable = function () {
         const isChromeCompat = (jsu.browserName === 'chrome' || jsu.browserName === 'chromium') && jsu.browserVersion >= 57;
         const isEdgeCompat = jsu.browserName === 'edge' && jsu.browserVersion >= 79;
-        return isChromeCompat ||
-               isEdgeCompat;
+        const isSafariCompat = jsu.browserName === 'safari' && jsu.browserVersion >= 16;
+        return isChromeCompat || isEdgeCompat || isSafariCompat;
     };
 }
 /* Translations related functions */
