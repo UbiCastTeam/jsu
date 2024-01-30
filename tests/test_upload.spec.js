@@ -3,7 +3,7 @@
 const assert = require('assert');
 require('./common.js');
 require('../src/jsu.js');
-import ChunkedUpload from '../src/lib/chunked-upload.js';
+import { ChunkedUpload } from '../src/lib/chunked-upload.js';
 
 describe('Upload', () => {
     it('chunkedUpload success', async () => {
