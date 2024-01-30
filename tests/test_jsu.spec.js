@@ -1,4 +1,4 @@
-/* globals require, describe, it */
+/* globals require, describe, it, process */
 const assert = require('assert');
 require('./common.js');
 import JavaScriptUtilities from '../src/jsu.js';
@@ -6,7 +6,7 @@ const jsu = new JavaScriptUtilities();
 
 describe('JSU', () => {
     it('should return correct version', () => {
-        assert(jsu.version === 8);
+        assert(jsu.version === 9);
     });
     it('should set/get cookies', () => {
         jsu.setCookie('a', '1');
@@ -103,6 +103,7 @@ describe('JSU', () => {
         assert(obj.b);
     });
     it('should getWebglContext', () => {
+        console.error(process.env);
         const testDatas = [
             {'options': {}, 'browserName': 'chrome'},
             {'options': {}, 'browserName': 'safari'}

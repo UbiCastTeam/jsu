@@ -4,7 +4,7 @@ Module to upload a file by chunks.
 /* global jsu */
 
 // eslint-disable-next-line no-unused-vars
-class ChunkedUpload {
+export default class ChunkedUpload {
     constructor (options) {
         // Get and check options
         const mandatoryArgs = [
@@ -51,7 +51,10 @@ class ChunkedUpload {
             'successCallback': null,
 
             // Function. The function to call if the upload fails. Arguments: <message: string>.
-            'failureCallback': null
+            'failureCallback': null,
+
+            // Avoid console logs while in test
+            'inTest': false
         };
         for (const arg of mandatoryArgs) {
             if (!options[arg]) {
@@ -70,7 +73,7 @@ class ChunkedUpload {
     }
 
     log () {
-        if (this.debugMode) {
+        if (this.debugMode && !this.inTest) {
             console.log.apply(null, arguments);
         }
     }
@@ -176,10 +179,15 @@ class ChunkedUpload {
                         self.sendNextChunk(nextStart, 0);
                     }
                 } else {
-                    console.error('Failed to send chunk:', response);
+                    if (!self.inTest) {
+                        console.log(self.inTest);
+                        //console.error('Failed to send chunk:', response);
+                    }
                     if (retries < self.maxRetry) {
                         if (response.offset !== undefined && start !== response.offset) {
-                            console.warn('Jumping from offset ' + start + ' to ' + response.offset);
+                            if (!self.inTest) {
+                                console.warn('Jumping from offset ' + start + ' to ' + response.offset);
+                            }
                             start = response.offset;
                         }
                         self.onRetry(xhr, self.sendNextChunk.bind(self, start, retries + 1));
@@ -214,7 +222,9 @@ class ChunkedUpload {
                     self.onProgress(100);
                     self.onSuccess();
                 } else {
-                    console.error('Failed to call complete:', response);
+                    if (!self.inTest) {
+                        console.error('Failed to call complete:', response);
+                    }
                     if (retries < self.maxRetry) {
                         self.onRetry(xhr, self.completeUpload.bind(self, retries + 1));
                     } else {
