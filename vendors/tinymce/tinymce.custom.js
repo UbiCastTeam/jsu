@@ -6,7 +6,11 @@ window.tinymceCustomGlobalOptions = {};
 window.tinymceCustomInit = function (options) {
     const onDOMReady = function () {
         // Allowed elements must match the list from Django web utils (html_utils)
-        const ALLOWED_TAGS = ['div', 'p', 'span', 'br', 'b', 'strong', 'i', 'em', 'u', 'sub', 'sup', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'img', 'fieldset', 'legend', 'pre', 'code', 'blockquote', 'video', 'source'];
+        const ALLOWED_TAGS = [
+            'div', 'p', 'span', 'br', 'b', 'strong', 'i', 'em', 'u', 'sub', 'sup', 'a', 'ul', 'ol', 'li',
+            'h1', 'h2', 'h3', 'h4', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'img', 'fieldset', 'legend',
+            'pre', 'code', 'blockquote', 'video', 'source'
+        ];
         const ALLOWED_ATTRS = {
             '*': ['class', 'style'],
             'a': ['href', 'target', 'title'],
@@ -16,7 +20,11 @@ window.tinymceCustomInit = function (options) {
             'source': ['src', 'type'],
             'video': ['src', 'poster', 'loop', 'autoplay', 'muted', 'controls', 'playsinline', 'preload']
         };
-        const ALLOWED_CSS = ['margin', 'padding', 'color', 'background', 'vertical-align', 'font-weight', 'font-size', 'font-style', 'text-decoration', 'text-align', 'text-shadow', 'border', 'border-radius', 'box-shadow', 'width', 'height', 'overflow'];
+        const ALLOWED_CSS = [
+            'margin', 'padding', 'color', 'background', 'vertical-align', 'font-weight',
+            'font-size', 'font-style', 'text-decoration', 'text-align', 'text-shadow',
+            'border', 'border-radius', 'box-shadow', 'width', 'height', 'overflow'
+        ];
 
         // Format valid elements for TinyMCE
         const validElements = [];
