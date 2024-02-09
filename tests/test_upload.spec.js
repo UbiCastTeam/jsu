@@ -1,10 +1,9 @@
-/* globals require, describe, it, ChunkedUpload */
+/* globals require, describe, it */
 
 const assert = require('assert');
 require('./common.js');
 require('../src/jsu.js');
-require('../src/lib/chunked-upload.js');
-
+import { ChunkedUpload } from '../src/lib/chunked-upload.js';
 
 describe('Upload', () => {
     it('chunkedUpload success', async () => {
@@ -17,7 +16,7 @@ describe('Upload', () => {
         let success = null;
         let msg = null;
         new ChunkedUpload({
-            debugMode: true,
+            inTest: true,
             file: blob,
             uploadURL: 'http://localhost:9876/base/tests/mocking/upload-chunk-ok.json',
             completeURL: 'http://localhost:9876/base/tests/mocking/upload-complete-ok.json',
@@ -56,7 +55,7 @@ describe('Upload', () => {
         let success = null;
         let msg = null;
         new ChunkedUpload({
-            debugMode: true,
+            inTest: true,
             file: blob,
             uploadURL: 'http://localhost:9876?upload',
             completeURL: 'http://localhost:9876?complete',
@@ -109,6 +108,7 @@ describe('Upload', () => {
         let success = null;
         let msg = null;
         new ChunkedUpload({
+            inTest: true,
             file: blob,
             uploadURL: 'http://localhost:9876?upload',
             completeURL: 'http://localhost:9876?complete',
@@ -148,6 +148,7 @@ describe('Upload', () => {
         let success = null;
         let msg = null;
         new ChunkedUpload({
+            inTest: true,
             file: blob,
             uploadURL: 'http://localhost:9876/base/tests/mocking/upload-chunk-ok.json',
             completeURL: 'http://localhost:9876?complete',

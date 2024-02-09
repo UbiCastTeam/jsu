@@ -1,9 +1,8 @@
 // Karma configuration
 // Generated on Tue Sep 27 2022 10:45:26 GMT+0200 (Central European Summer Time)
 /* globals module */
-module.exports = function (config) {
+module.exports = (config) => {
     config.set({
-
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
 
@@ -30,8 +29,8 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
         preprocessors: {
-            'src/**/*.js': ['coverage'],
-            'tests/*.spec.js': ['browserify']
+            'src/**/*.js': ['browserify', 'coverage'],
+            'tests/*.spec.js': ['browserify'],
         },
 
 
@@ -60,7 +59,13 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://www.npmjs.com/search?q=keywords:karma-launcher
-        browsers: ['ChromeHeadless'],
+        browsers: ['ChromeHeadlessNoSandbox'],
+        customLaunchers: {
+            ChromeHeadlessNoSandbox: {
+                base: 'ChromeHeadless',
+                flags: ['--no-sandbox']
+            }
+        },
 
 
         // Continuous Integration mode
@@ -72,11 +77,14 @@ module.exports = function (config) {
         concurrency: 1,
 
         browserify: {
-            debug: true // display file line error
+            debug: true,
+            plugin: ['esmify']
         },
         coverageReporter: {
-            type: 'text',
-            dir: '.coverage'
+            reporters:[
+                {type: 'lcov', dir:'coverage/', includeAllSources: true},
+                {type: 'text', includeAllSources: true}
+            ]
         }
     });
 };
