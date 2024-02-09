@@ -18,7 +18,7 @@ export class ChunkedUpload {
             'completeURL'
         ];
         const optionalArgs = {
-            // Boolean. Log mesage in console. If null, debug will be enabled if "debug" is in URL hash.
+            // Boolean. Log debug mesage in console. If null, debug will be enabled if "debug" is in URL hash.
             'debugMode': null,
 
             // Dictionary. Extra headers for requests.
@@ -72,9 +72,21 @@ export class ChunkedUpload {
         this.sendFile();
     }
 
-    log () {
+    logDebug () {
         if (this.debugMode && !this.inTest) {
             console.log.apply(null, arguments);
+        }
+    }
+
+    logError () {
+        if (!this.inTest) {
+            console.error.apply(null, arguments);
+        }
+    }
+
+    logWarn () {
+        if (!this.inTest) {
+            console.warn.apply(null, arguments);
         }
     }
 
@@ -92,7 +104,7 @@ export class ChunkedUpload {
         if (promise === undefined) {
             const self = this;
             promise = new Promise(function (resolve) {
-                self.log('Retrying in ' + self.retryDelay + ' ms...');
+                self.logDebug('Retrying in ' + self.retryDelay + ' ms...');
                 setTimeout(resolve, self.retryDelay);
             });
         }
@@ -125,12 +137,12 @@ export class ChunkedUpload {
                 this.fileName = 'file' + this.fileNameSuffix + '.tmp';
             }
         }
-        this.log('Number of chunk to send:', Math.ceil(this.file.size / this.chunkSize), this.chunkSize, this.file.size);
+        this.logDebug('Number of chunk to send:', Math.ceil(this.file.size / this.chunkSize), this.chunkSize, this.file.size);
         this.sendNextChunk(0, 0);
     }
 
     sendNextChunk (start, retries) {
-        this.log('Sending chunk:', 'start:', start, 'total size:', this.file.size, 'retries:', retries);
+        this.logDebug('Sending chunk:', 'start:', start, 'total size:', this.file.size, 'retries:', retries);
 
         const end = Math.min(start + this.chunkSize, this.file.size);
 
@@ -149,7 +161,7 @@ export class ChunkedUpload {
             this.extraHeaders,
             {'Content-Range': 'bytes ' + start + '-' + (end - 1) + '/' + this.file.size}
         );
-        this.log('Content-Range', headers['Content-Range']);
+        this.logDebug('Content-Range', headers['Content-Range']);
         const self = this;
         jsu.httpRequest({
             method: 'POST',
@@ -164,13 +176,13 @@ export class ChunkedUpload {
                         value += progressStep * (event.loaded / event.total);
                     }
                     value = Math.floor(95 * value); // Last 5 percents are for complete call
-                    self.log('Progress:', value, progressStep, event.loaded, event.total);
+                    self.logDebug('Progress:', value, progressStep, event.loaded, event.total);
                     self.onProgress(value);
                 }
             },
             callback: function (xhr, response) {
                 if (xhr.status == 200 && response.upload_id) {
-                    self.log('Chunk sent', response);
+                    self.logDebug('Chunk sent', response);
                     self.uploadId = response.upload_id;
                     const nextStart = end;
                     if (nextStart >= self.file.size) {
@@ -179,15 +191,10 @@ export class ChunkedUpload {
                         self.sendNextChunk(nextStart, 0);
                     }
                 } else {
-                    if (!self.inTest) {
-                        console.log(self.inTest);
-                        //console.error('Failed to send chunk:', response);
-                    }
+                    self.logError('Failed to send chunk:', response);
                     if (retries < self.maxRetry) {
                         if (response.offset !== undefined && start !== response.offset) {
-                            if (!self.inTest) {
-                                console.warn('Jumping from offset ' + start + ' to ' + response.offset);
-                            }
+                            self.logWarn('Jumping from offset ' + start + ' to ' + response.offset);
                             start = response.offset;
                         }
                         self.onRetry(xhr, self.sendNextChunk.bind(self, start, retries + 1));
@@ -200,7 +207,7 @@ export class ChunkedUpload {
     }
 
     completeUpload (retries) {
-        this.log('Calling complete:', 'expected size:', this.file.size, 'retries:', retries);
+        this.logDebug('Calling complete:', 'expected size:', this.file.size, 'retries:', retries);
         const formData = new FormData();
         formData.append('upload_id', this.uploadId);
         formData.append('expected_size', this.file.size);
@@ -218,13 +225,11 @@ export class ChunkedUpload {
             json: true,
             callback: function (xhr, response) {
                 if (xhr.status == 200 && response.upload_id) {
-                    self.log('Complete succeeded:', response);
+                    self.logDebug('Complete succeeded:', response);
                     self.onProgress(100);
                     self.onSuccess();
                 } else {
-                    if (!self.inTest) {
-                        console.error('Failed to call complete:', response);
-                    }
+                    self.logError('Failed to call complete:', response);
                     if (retries < self.maxRetry) {
                         self.onRetry(xhr, self.completeUpload.bind(self, retries + 1));
                     } else {
