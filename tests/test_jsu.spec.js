@@ -6,7 +6,7 @@ const jsu = new JavaScriptUtilities();
 
 describe('JSU', () => {
     it('should return correct version', () => {
-        assert(jsu.version === 9);
+        assert(jsu.version === 10);
     });
     it('should set/get cookies', () => {
         jsu.setCookie('a', '1');

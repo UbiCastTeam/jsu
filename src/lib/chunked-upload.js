@@ -3,7 +3,6 @@ Module to upload a file by chunks.
 */
 /* global jsu */
 
-// eslint-disable-next-line no-unused-vars
 export class ChunkedUpload {
     constructor (options) {
         // Get and check options

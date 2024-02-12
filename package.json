@@ -17,6 +17,7 @@
     "gulp": "latest",
     "gulp-concat": "latest",
     "gulp-minify": "latest",
+    "gulp-replace": "latest",
     "karma": "latest",
     "karma-browserify": "latest",
     "karma-chai": "latest",

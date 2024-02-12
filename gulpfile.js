@@ -1,16 +1,26 @@
-/* sudo npm install -g gulp gulp-concat gulp-minify */
+/* sudo npm install -g gulp gulp-concat gulp-minify gulp-replace */
 import gulp from 'gulp';
-import * as concat from 'gulp-concat';
-import * as minify from 'gulp-minify';
+import concat from 'gulp-concat';
+import minify from 'gulp-minify';
+import replace from 'gulp-replace';
 
 gulp.task('autobuild', function () {
     gulp.watch('src/**', {'ignoreInitial': false}, gulp.series('build'));
 });
 
 gulp.task('build', function () {
-    return gulp.src(['src/jsu.js', 'src/lib/*.js'])
-        .pipe(concat.default('dist/jsu.js'))
-        .pipe(minify.default({
+    gulp.src(['src/jsu.js', 'src/lib/*.js'])
+        .pipe(concat('dist/jsu.js'))
+        .pipe(minify({
+            ext: {'src': '.tmp.mjs', 'min': '.min.mjs'},
+            compress: {'hoist_vars': true}
+        }))
+        .pipe(gulp.dest('.'));
+
+    return gulp.src(['src/jsu.js', 'src/lib/*.js', 'src/load.js'])
+        .pipe(replace(/export (default ){0,1}/g, ''))
+        .pipe(concat('dist/jsu.js'))
+        .pipe(minify({
             ext: {'src': '.tmp.js', 'min': '.min.js'},
             compress: {'hoist_vars': true}
         }))

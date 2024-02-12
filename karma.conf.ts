@@ -14,7 +14,8 @@ module.exports = (config) => {
 
         // list of files / patterns to load in the browser
         files: [
-            'src/**/*.js',
+            'src/jsu.js',
+            'src/lib/*.js',
             'tests/*.spec.js',
             // fixtures
             {pattern: 'tests/mocking/*.json', watched: true, served: true, included: false}
@@ -30,7 +31,7 @@ module.exports = (config) => {
         // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
         preprocessors: {
             'src/**/*.js': ['browserify', 'coverage'],
-            'tests/*.spec.js': ['browserify'],
+            'tests/*.spec.js': ['browserify']
         },
 
 
