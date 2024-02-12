@@ -23,5 +23,6 @@ package-lock.json
 node_modules
 
 *.tmp.js
+*.tmp.mjs
 *.mo
 

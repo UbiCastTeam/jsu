@@ -1,12 +1,10 @@
-/*******************************************
-* jsu: JavaScript Utilities                *
-*******************************************/
-const VERSION = 9;
+/*
+jsu (JavaScript Utilities)
+*/
 
 export default class JavaScriptUtilities {
-
     constructor () {
-        this.version = VERSION;
+        this.version = 10; // Change this when updating this script
         this.ignoreUntilFocusChanges = false;
         this.userAgent = window.navigator && window.navigator.userAgent ? window.navigator.userAgent.toLowerCase() : 'unknown';
         this.userAgentData = null;
@@ -24,11 +22,12 @@ export default class JavaScriptUtilities {
         this._overrideHttpRequest();
         if (!window.jsu) {
             window.jsu = this;
-        } else {
-            if (VERSION != window.jsu.version) {
-                console.warn('Another version of jsu.js was already imported, jsu will be replaced by most recent version. Version: "' + VERSION + '", other version: "' + window.jsu.version + '".');
-            }
-            if (window.jsu.version < VERSION) {
+        } else if (this.version != window.jsu.version) {
+            console.warn(
+                'Another version of jsu.js was already imported, jsu will be replaced by most recent version. ' +
+                'Version: "' + this.version + '", other version: "' + window.jsu.version + '".'
+            );
+            if (window.jsu.version < this.version) {
                 window.jsu = this;
             }
         }
@@ -390,7 +389,9 @@ export default class JavaScriptUtilities {
             const platform = window.navigator.platform.toLowerCase();
             if (platform.indexOf('ipad') != -1 || platform.indexOf('iphone') != -1 || platform.indexOf('ipod') != -1) {
                 name = 'ios';
-                version = parseFloat(('' + (/CPU.*OS ([0-9_]{1,5})|(CPU like).*AppleWebKit.*Mobile/i.exec(navigator.userAgent) || [0,''])[1]).replace('undefined', '3_2').replace('_', '.').replace('_', '')) || false;
+                version = parseFloat(('' + (
+                    /CPU.*OS ([0-9_]{1,5})|(CPU like).*AppleWebKit.*Mobile/i.exec(navigator.userAgent) || [0,'']
+                )[1]).replace('undefined', '3_2').replace('_', '.').replace('_', '')) || false;
             }
         }
         if (!name && window.navigator && window.navigator.appVersion) {
@@ -490,7 +491,21 @@ export default class JavaScriptUtilities {
             this.isMobile = Boolean(window.navigator.userAgentData.mobile);
         } else {
             const ua = this.userAgent;
-            this.isMobile = ua.indexOf('iphone') != -1 || ua.indexOf('ipod') != -1 || ua.indexOf('android') != -1 || ua.indexOf('iemobile') != -1 || ua.indexOf('opera mobi') != -1 || ua.indexOf('opera mini') != -1 || ua.indexOf('windows ce') != -1 || ua.indexOf('fennec') != -1 || ua.indexOf('series60') != -1 || ua.indexOf('symbian') != -1 || ua.indexOf('blackberry') != -1 || window.orientation !== undefined || (window.navigator && window.navigator.platform == 'iPad');
+            this.isMobile = (
+                ua.indexOf('iphone') != -1
+                || ua.indexOf('ipod') != -1
+                || ua.indexOf('android') != -1
+                || ua.indexOf('iemobile') != -1
+                || ua.indexOf('opera mobi') != -1
+                || ua.indexOf('opera mini') != -1
+                || ua.indexOf('windows ce') != -1
+                || ua.indexOf('fennec') != -1
+                || ua.indexOf('series60') != -1
+                || ua.indexOf('symbian') != -1
+                || ua.indexOf('blackberry') != -1
+                || window.orientation !== undefined
+                || (window.navigator && window.navigator.platform == 'iPad')
+            );
         }
         this.isTactile = document.documentElement && 'ontouchstart' in document.documentElement;
 
@@ -735,4 +750,3 @@ export default class JavaScriptUtilities {
         };
     }
 }
-new JavaScriptUtilities();
