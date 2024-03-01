@@ -5,47 +5,47 @@ import JavaScriptUtilities from '../src/jsu.js';
 const jsu = new JavaScriptUtilities();
 
 describe('JSU', () => {
-    it('should return correct version', () => {
-        assert(jsu.version === 10);
+    it('should return the correct version', () => {
+        assert(jsu.version === 11);
     });
-    it('should set/get cookies', () => {
+    it('should handle getCookie() and setCookie()', () => {
         jsu.setCookie('a', '1');
         const value = jsu.getCookie('a');
         assert(value == '1');
     });
-    it('should strip', () => {
+    it('should handle strip()', () => {
         const text = '     test     \n  test      \n test  \n  test     ';
         const value = jsu.strip(text);
         assert(value == 'test     \n  test      \n test  \n  test');
     });
-    it('should slugify', () => {
+    it('should handle slugify()', () => {
         const text = '>@)(#<!test?/"\'][{}=+&^`%$';
         const value = jsu.slugify(text);
         assert(value == 'test');
     });
-    it('should stripHTML', () => {
+    it('should handle stripHTML()', () => {
         const text = '<div><div class="test">test</div></div>';
         const value = jsu.stripHTML(text);
         assert(value == 'test');
     });
-    it('should escapeHTML and decodeHTML', () => {
+    it('should handle escapeHTML() and decodeHTML()', () => {
         const html = '<div class="test">test &#34;</div>';
         const encodedHTML = jsu.escapeHTML(html);
         assert(encodedHTML == '&lt;div class="test"&gt;test &amp;#34;&lt;/div&gt;');
         const decodedHTML = jsu.decodeHTML(encodedHTML);
         assert(decodedHTML == html);
     });
-    it('should escapeAttribute', () => {
+    it('should handle escapeAttribute()', () => {
         const html = '<div class="test">test\n\'</div>';
         const encodedHTML = jsu.escapeAttribute(html);
         assert(encodedHTML == '<div class=&quot;test&quot;>test&#13;&#10;&#39;</div>');
     });
-    it('should getClickPosition', () => {
+    it('should handle getClickPosition()', () => {
         const evt = {'pageX': 10, 'pageY': 10};
         const positions = jsu.getClickPosition(evt, document.body);
         assert(JSON.stringify(positions) == JSON.stringify({'x': 10, 'y': 10}));
     });
-    it('should onDOMLoad', async () => {
+    it('should handle onDOMLoad()', async () => {
         let load = false;
         jsu.onDOMLoad(() => {
             load = true;
@@ -55,7 +55,7 @@ describe('JSU', () => {
         }, 100);
         assert(load);
     });
-    it('should do a httpRequest', async () => {
+    it('should handle httpRequest()', async () => {
         const requestStatuses = [];
         const testDatas = [
             {'method': 'GET', 'params': {'test': 1}},
@@ -82,7 +82,7 @@ describe('JSU', () => {
         }, 500);
         assert(JSON.stringify(requestStatuses) == JSON.stringify([200, 200, 200, 200, 200, 200, 200]));
     }).timeout(5000);
-    it('should compareVersions', () => {
+    it('should handle compareVersions()', () => {
         let result = jsu.compareVersions('1.1.1', '=', '1.1.1');
         assert(result == 0);
         result = jsu.compareVersions('1.1.0', '=', '1.1.1');
@@ -90,7 +90,7 @@ describe('JSU', () => {
         result = jsu.compareVersions('1.1.2', '=', '1.1.1');
         assert(result == -1);
     });
-    it('should setObjectAttributes', () => {
+    it('should handle setObjectAttributes()', () => {
         const obj = {};
         const data = {'a': 1, 'b': 1, 'translations': {'en': {'a': 'a'}}};
         const allowedAttributes = ['b'];
@@ -102,7 +102,7 @@ describe('JSU', () => {
         assert(!obj.translations);
         assert(obj.b);
     });
-    it('should getWebglContext', () => {
+    it('should handle getWebglContext()', () => {
         console.error(process.env);
         const testDatas = [
             {'options': {}, 'browserName': 'chrome'},
@@ -113,17 +113,17 @@ describe('JSU', () => {
             assert(jsu.getWebglContext(canvas, data.options, data.browserName));
         }
     });
-    it('should test isInIframe', () => {
+    it('should handle isInIframe()', () => {
         // karma window is in an iframe <iframe id="context" src="context.html" width="100%" height="100%"></iframe>
         assert(jsu.isInIframe());
     });
-    it('should attemptFocus', () => {
+    it('should handle attemptFocus()', () => {
         const focusableElement = document.createElement('input');
         document.body.appendChild(focusableElement);
         assert(jsu.isFocusable(focusableElement));
         assert(jsu.attemptFocus(focusableElement));
     });
-    it('should focusFirstDescendant and focusLastDescendant', () => {
+    it('should handle focusFirstDescendant() and focusLastDescendant()', () => {
         const focusableElementOne = document.createElement('input');
         focusableElementOne.id = '1';
         const focusableElementTwo = document.createElement('button');
@@ -135,7 +135,7 @@ describe('JSU', () => {
         assert(jsu.focusLastDescendant(document.body));
         assert(document.activeElement == focusableElementTwo);
     });
-    it('should test UA', () => {
+    it('should handle user agents', () => {
         assert(jsu.userAgent);
         assert(jsu.osName);
         assert(jsu.osVersion !== undefined);
@@ -144,7 +144,7 @@ describe('JSU', () => {
         assert(jsu.browserName);
         assert(jsu.browserVersion);
     });
-    it('should test isRecordingAvailable', () => {
+    it('should handle isRecordingAvailable()', () => {
         const data = [
             ['safari', '6', false],
             ['firefox', '30', false],
@@ -161,7 +161,7 @@ describe('JSU', () => {
             assert(jsu.isRecordingAvailable() === result, `${browserName}@${browserVersion} isRecordingAvailable ${jsu.isRecordingAvailable()}`);
         }
     });
-    it('should manage translations', () => {
+    it('should handle translations', () => {
         const translations = {
             'fr': {
                 'lang': 'fr',
@@ -205,10 +205,10 @@ describe('JSU', () => {
         assert(jsu.getDateDisplay('2021-12-30 00:12:14') == '30 December 2021 at 12:12 AM', `${jsu.getDateDisplay('2021-12-30 00:12:14')} == '30 December 2021 at 12:12 AM'`);
         assert(jsu.getDateDisplay('2021-19-57 69:98:84') == '2021-19-57 69:98:84', `${jsu.getDateDisplay('2021-19-57 69:98:84')} == '2021-19-57 69:98:84'`);
         assert(jsu.getDateDisplay('Invalid date') == 'Invalid date', `${jsu.getDateDisplay('Invalid date')} == 'Invalid date'`);
-        assert(jsu.getSizeDisplay() == '0 B', `${jsu.getSizeDisplay()} ==  '0 B'`);
-        assert(jsu.getSizeDisplay('123456789') == '123.5 MB', `${jsu.getSizeDisplay('123456789')} ==  '123.5 MB'`);
-        assert(jsu.getSizeDisplay('12345678910') == '12.3 GB', `${jsu.getSizeDisplay('12345678910')} ==  '123.5 MB'`);
-        assert(jsu.getSizeDisplay('1234567891011') == '1.2 TB', `${jsu.getSizeDisplay('1234567891011')} ==  '123.5 MB'`);
+        assert(jsu.getSizeDisplay() == '0 B', `${jsu.getSizeDisplay()} == '0 B'`);
+        assert(jsu.getSizeDisplay('123456789') == '123.5 MB', `${jsu.getSizeDisplay('123456789')} == '123.5 MB'`);
+        assert(jsu.getSizeDisplay('12345678910') == '12.3 GB', `${jsu.getSizeDisplay('12345678910')} == '123.5 MB'`);
+        assert(jsu.getSizeDisplay('1234567891011') == '1.2 TB', `${jsu.getSizeDisplay('1234567891011')} == '123.5 MB'`);
         jsu.useLang('fr');
         assert(jsu.getCurrentLang() == 'fr');
         assert(JSON.stringify(jsu.getCurrentCatalog()) == JSON.stringify(translations['fr']));
@@ -217,7 +217,7 @@ describe('JSU', () => {
         assert(jsu.getDateDisplay('2021-12-30 00:12:14') == '30 décembre 2021 à 00:12', `${jsu.getDateDisplay('2021-12-30 00:12:14')} == '30 décembre 2021 à 00:12'`);
         assert(jsu.getDateDisplay('2021-19-57 69:98:84') == '2021-19-57 69:98:84', `${jsu.getDateDisplay('2021-19-57 69:98:84')} == '2021-19-57 69:98:84'`);
         assert(jsu.getDateDisplay('Invalid date') == 'Invalid date', `${jsu.getDateDisplay('Invalid date')} == 'Invalid date'`);
-        assert(jsu.getSizeDisplay('123456789') == '123.5 Mo', `${jsu.getSizeDisplay('123456789')} ==  '123.5 Mo'`);
+        assert(jsu.getSizeDisplay('123456789') == '123.5 Mo', `${jsu.getSizeDisplay('123456789')} == '123.5 Mo'`);
         jsu.useLang('x');
         assert(jsu.translate('lang') == 'en');
     });

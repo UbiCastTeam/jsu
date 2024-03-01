@@ -18,7 +18,7 @@ gulp.task('build', function () {
         .pipe(gulp.dest('.'));
 
     return gulp.src(['src/jsu.js', 'src/lib/*.js', 'src/load.js'])
-        .pipe(replace(/export (default ){0,1}/g, ''))
+        .pipe(replace(/export (default )?/g, ''))
         .pipe(concat('dist/jsu.js'))
         .pipe(minify({
             ext: {'src': '.tmp.js', 'min': '.min.js'},

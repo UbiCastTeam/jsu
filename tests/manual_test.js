@@ -1,7 +1,7 @@
 /*******************************************
 * jsu: Test script                         *
 *******************************************/
-/* global jsu */
+/* globals jsu, PollingManager */
 const host = 'http://localhost:8083';
 
 function objectRepr (obj) {
@@ -177,6 +177,27 @@ function testTranslation () {
     ele.innerHTML = '<p>' + jsu.escapeHTML(repr) + '</p>';
 }
 
+function testPolling () {
+    const ele = document.getElementById('polling_report');
+    const calls = [];
+    let count = 0;
+    const polling = new PollingManager(function (callback) {
+        count += 1;
+        calls.push('Call #' + count + ' at ' + (new Date()).toTimeString());
+        if (calls.length > 10) {
+            calls.shift();
+        }
+        ele.innerHTML = calls.join('<br/>');
+        callback();
+    }, 10000);
+    document.getElementById('test_polling_disable').addEventListener('click', function () {
+        polling.disable();
+    });
+    document.getElementById('test_polling_enable').addEventListener('click', function () {
+        polling.enable();
+    });
+}
+
 function testRequest ({method, url, json, params, data, append, noText}) {
     jsu.httpRequest({
         url: url,
@@ -207,6 +228,7 @@ jsu.onDOMLoad(function () {
     displayUserAgent();
     testWebGL();
     testTranslation();
+    testPolling();
     document.getElementById('test_request_localhost_json').addEventListener('click', function () {
         testRequest({'url': host, 'json': true});
     });

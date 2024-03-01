@@ -5,8 +5,8 @@ require('./common.js');
 require('../src/jsu.js');
 import { ChunkedUpload } from '../src/lib/chunked-upload.js';
 
-describe('Upload', () => {
-    it('chunkedUpload success', async () => {
+describe('ChunkedUpload', () => {
+    it('should handle success', async () => {
         const blob = new Blob(['Test file content'], {
             type: 'application/json',
         });
@@ -45,7 +45,7 @@ describe('Upload', () => {
         assert(progress === 100);
         assert(retries === 0);
     });
-    it('chunkedUpload retry promise', async () => {
+    it('should handle retry', async () => {
         const blob = new Blob(['Test file content'], {
             type: 'application/json',
         });
@@ -98,7 +98,7 @@ describe('Upload', () => {
         assert(progress === 100);
         assert(retries === 2);
     });
-    it('chunkedUpload error on chunk upload', async () => {
+    it('should handle error on chunk upload', async () => {
         const blob = new Blob(['Test file content'], {
             type: 'application/json',
         });
@@ -138,7 +138,7 @@ describe('Upload', () => {
         assert(progress === 95);
         assert(retries === 2);
     });
-    it('chunkedUpload error on complete', async () => {
+    it('should handle error on complete', async () => {
         const blob = new Blob(['Test file content'], {
             type: 'application/json',
         });
