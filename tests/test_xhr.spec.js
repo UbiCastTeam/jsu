@@ -7,7 +7,7 @@ const jsu = new JavaScriptUtilities();
 
 
 describe('XHR', () => {
-    it('should getHashFromRequest', () => {
+    it('should handle getHashFromRequest()', () => {
         const formData = new FormData();
         formData.append('test', 3);
         const blob = new Blob([JSON.stringify({'test': 1})], {
@@ -46,7 +46,7 @@ describe('XHR', () => {
             }
         }
     });
-    it('should block identical request', async () => {
+    it('should block identical requests', async () => {
         const testDatas = [
             {'method': 'GET'},
             {'method': 'GET'},
@@ -100,7 +100,7 @@ describe('XHR', () => {
             JSON.stringify(errorResults) == JSON.stringify(correctErrorResults),
             `${JSON.stringify(errorResults)} == ${JSON.stringify(correctErrorResults)}`);
     }).timeout(5000);
-    it('should trigger on abort', async () => {
+    it('should trigger callback on abort', async () => {
         const requestResults = [];
         const xhrRequest = jsu.httpRequest({
             'url': 'http://localhost:9876',
@@ -117,5 +117,4 @@ describe('XHR', () => {
             JSON.stringify(requestResults) == JSON.stringify(correctResults),
             `${JSON.stringify(requestResults)} == ${JSON.stringify(correctResults)}`);
     }).timeout(5000);
-
 });

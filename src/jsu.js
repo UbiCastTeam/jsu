@@ -4,7 +4,7 @@ jsu (JavaScript Utilities)
 
 export default class JavaScriptUtilities {
     constructor () {
-        this.version = 10; // Change this when updating this script
+        this.version = 11; // Change this when updating this script
         this.ignoreUntilFocusChanges = false;
         this.userAgent = window.navigator && window.navigator.userAgent ? window.navigator.userAgent.toLowerCase() : 'unknown';
         this.userAgentData = null;
