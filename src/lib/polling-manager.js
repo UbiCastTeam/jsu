@@ -24,7 +24,7 @@ export class PollingManager {
         this.interval = interval;
         this.fct = fct;
 
-        if (enabled === true || enabled === undefined) {
+        if (enabled === undefined || enabled === true) {
             this.enable();
         }
         document.addEventListener('visibilitychange', function () {
@@ -51,10 +51,12 @@ export class PollingManager {
         if (this.enabled && !this.running) {
             this.running = true;
             this.cancel();
-            this.fct(function () {
+            this.fct(function (planNext) {
                 this.lastRun = (new Date()).getTime();
                 this.running = false;
-                this.plan(this.interval);
+                if (planNext === undefined || planNext === true) {
+                    this.plan(this.interval);
+                }
             }.bind(this));
         }
     }
