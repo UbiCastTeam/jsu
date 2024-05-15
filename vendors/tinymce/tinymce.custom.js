@@ -45,6 +45,7 @@ window.tinymceCustomInit = function (options) {
 
         // Build default options
         const opt = {
+            'license_key': 'gpl',
             'valid_elements': validElements.join(','),
             'valid_styles': {'*': ALLOWED_CSS.join(',')},
             'menubar': false,
@@ -80,9 +81,6 @@ window.tinymceCustomInit = function (options) {
             for (const key in options) {
                 opt[key] = options[key];
             }
-        }
-        if (!opt.selector) {
-            opt.mode = 'textareas';
         }
         tinymce.init(opt);
     };
