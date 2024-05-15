@@ -12,9 +12,9 @@
   "author": "",
   "license": "LGPLv3",
   "devDependencies": {
-    "eslint": "latest",
+    "eslint": "< 9",
     "esmify": "latest",
-    "gulp": "latest",
+    "gulp": "< 5",
     "gulp-concat": "latest",
     "gulp-minify": "latest",
     "gulp-replace": "latest",
