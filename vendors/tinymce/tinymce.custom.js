@@ -26,6 +26,12 @@ window.tinymceCustomInit = function (options) {
             'border', 'border-radius', 'box-shadow', 'width', 'height', 'overflow'
         ];
 
+        // Add iframe to allowed if needed
+        if (options.allowIframes) {
+            ALLOWED_TAGS.push('iframe');
+            ALLOWED_ATTRS['iframe'] = ['src', 'width', 'height', 'allow', 'allowfullscreen', 'frameborder', 'scrolling'];
+        }
+
         // Format valid elements for TinyMCE
         const validElements = [];
         for (const tag of ALLOWED_TAGS) {
