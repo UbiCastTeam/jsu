@@ -718,7 +718,7 @@ export default class JavaScriptUtilities {
                     // we store everything in an object
                     subContent.push({
                         'id': id,
-                        'content': content.join(' '),
+                        'content': content.join(' ').trim(),
                         'time_start': times[0],
                         'time_end': times[1]
                     });
