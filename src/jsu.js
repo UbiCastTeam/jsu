@@ -692,7 +692,7 @@ export default class JavaScriptUtilities {
         }
         return hash;
     }
-    parserSubtitle (subtitle) {
+    parseSubtitle (subtitle) {
         // First split each block of content
         const rows = subtitle.replace(/\r/g, '').split('\n\n');
         const subContent = [];
@@ -728,7 +728,7 @@ export default class JavaScriptUtilities {
         return subContent;
     }
     subtitleToText (text) {
-        const subContent = this.parserSubtitle(text);
+        const subContent = this.parseSubtitle(text);
         const textRows = [];
         for (const row of subContent) {
             if (row.content.endsWith('.') || row.content.endsWith('?') || row.content.endsWith('!')) {
