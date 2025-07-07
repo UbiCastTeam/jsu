@@ -692,6 +692,52 @@ export default class JavaScriptUtilities {
         }
         return hash;
     }
+    parseSubtitle (subtitle) {
+        // First split each block of content
+        const rows = subtitle.replace(/\r/g, '').split('\n\n');
+        const subContent = [];
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            // split block content
+            const content = row.split('\n');
+            const id = i;
+            if (!content[0].includes(' --> ')) {
+                // content[0] should contain an id and not the time
+                // if it's the case we remove it
+                content.shift();
+            }
+            if (content.length >= 2) {
+                // if content is a valid block like
+                // 00:00:02.827 --> 00:00:06.383
+                // the subtitle text
+                // that can be in several lines
+                const times = content[0].split(' --> ');
+                content.shift();
+                if (times.length == 2) {
+                    // if we extracted the correct start and end time
+                    // we store everything in an object
+                    subContent.push({
+                        'id': id,
+                        'content': content.join(' ').trim(),
+                        'timeStart': times[0],
+                        'timeEnd': times[1]
+                    });
+                }
+            }
+        }
+        return subContent;
+    }
+    subtitleToText (text) {
+        const subContent = this.parseSubtitle(text);
+        const textRows = subContent.map((row) => {
+            let text = row.content;
+            if (text.endsWith('.') || text.endsWith('?') || text.endsWith('!')) {
+                text += '\n';
+            }
+            return text;
+        });
+        return textRows.join('');
+    }
     _overrideHttpRequest () {
         window.xhrOverride = true;
         // Avoid same ajax call if server doesn't respond yet
