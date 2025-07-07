@@ -709,8 +709,8 @@ export default class JavaScriptUtilities {
             if (content.length >= 2) {
                 // if content is a valid block like
                 // 00:00:02.827 --> 00:00:06.383
-                // multiple lines
-                // multiple lines
+                // the subtitle text
+                // that can be in several lines
                 const times = content[0].split(' --> ');
                 content.shift();
                 if (times.length == 2) {
@@ -719,8 +719,8 @@ export default class JavaScriptUtilities {
                     subContent.push({
                         'id': id,
                         'content': content.join(' ').trim(),
-                        'time_start': times[0],
-                        'time_end': times[1]
+                        'timeStart': times[0],
+                        'timeEnd': times[1]
                     });
                 }
             }
@@ -729,13 +729,13 @@ export default class JavaScriptUtilities {
     }
     subtitleToText (text) {
         const subContent = this.parseSubtitle(text);
-        const textRows = [];
-        for (const row of subContent) {
-            if (row.content.endsWith('.') || row.content.endsWith('?') || row.content.endsWith('!')) {
-                row.content += '\n';
+        const textRows = subContent.map((row) => {
+            let text = row.content;
+            if (text.endsWith('.') || text.endsWith('?') || text.endsWith('!')) {
+                text += '\n';
             }
-            textRows.push(row.content);
-        }
+            return text;
+        });
         return textRows.join('');
     }
     _overrideHttpRequest () {
