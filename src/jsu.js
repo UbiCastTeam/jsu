@@ -513,17 +513,10 @@ export default class JavaScriptUtilities {
         this.browserVersion = version;
     }
     isRecordingAvailable () {
-        const isFirefoxCompat = this.browserName === 'firefox' && this.browserVersion >= 45;
-        const isChromeCompat = (this.browserName === 'chrome' || this.browserName === 'chromium') && this.browserVersion >= 57;
-        const isSafariCompat = this.browserName === 'safari' && this.browserVersion >= 16;
-        const isEdgeCompat = this.browserName === 'edge' && this.browserVersion >= 79;
-        return isFirefoxCompat || isChromeCompat || isEdgeCompat || isSafariCompat;
+        return this.browserName === 'safari' ? !this.isMobile && this.browserVersion >= 16 : !this.isMobile;
     }
     isLivestreamingAvailable () {
-        const isChromeCompat = (this.browserName === 'chrome' || this.browserName === 'chromium') && this.browserVersion >= 57;
-        const isEdgeCompat = this.browserName === 'edge' && this.browserVersion >= 79;
-        const isSafariCompat = this.browserName === 'safari' && this.browserVersion >= 16;
-        return isChromeCompat || isEdgeCompat || isSafariCompat;
+        return this.isRecordingAvailable() && this.browserName !== 'firefox';
     }
     useLang (lang) {
         this._currentLang = lang;
