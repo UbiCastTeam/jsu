@@ -146,19 +146,42 @@ describe('JSU', () => {
     });
     it('should handle isRecordingAvailable()', () => {
         const data = [
-            ['safari', '6', false],
-            ['firefox', '30', false],
-            ['chrome', '30', false],
-            ['chromium', '30', false],
-            ['edge', '30', false],
-            ['firefox', '100', true],
-            ['chrome', '100', true],
-            ['edge', '100', true]
+            ['safari', '15', true, false],
+            ['firefox', '100', true, false],
+            ['chrome', '100', true, false],
+            ['edge', '100', true, false],
+            ['safari', '16', true, false],
+            ['safari', '15', false, false],
+            ['firefox', '100', false, true],
+            ['chrome', '100', false, true],
+            ['edge', '100', false, true],
+            ['safari', '16', false, true]
         ];
-        for (const [browserName, browserVersion, result] of data) {
+        for (const [browserName, browserVersion, isMobile, result] of data) {
             jsu.browserName = browserName;
             jsu.browserVersion = browserVersion;
+            jsu.isMobile = isMobile;
             assert(jsu.isRecordingAvailable() === result, `${browserName}@${browserVersion} isRecordingAvailable ${jsu.isRecordingAvailable()}`);
+        }
+    });
+    it('should handle isLivestreamingAvailable()', () => {
+        const data = [
+            ['safari', '15', true, false],
+            ['firefox', '100', true, false],
+            ['chrome', '100', true, false],
+            ['edge', '100', true, false],
+            ['safari', '16', true, false],
+            ['safari', '15', false, false],
+            ['firefox', '100', false, false],
+            ['chrome', '100', false, true],
+            ['edge', '100', false, true],
+            ['safari', '16', false, true]
+        ];
+        for (const [browserName, browserVersion, isMobile, result] of data) {
+            jsu.browserName = browserName;
+            jsu.browserVersion = browserVersion;
+            jsu.isMobile = isMobile;
+            assert(jsu.isLivestreamingAvailable() === result, `${browserName}@${browserVersion} isLivestreamingAvailable ${jsu.isLivestreamingAvailable()}`);
         }
     });
     it('should handle translations', () => {
