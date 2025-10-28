@@ -33,6 +33,9 @@ fi
 echo "Running po generation with arguments:"
 echo "sources_path: \"${sources_path}\" locales_path: \"${locales_path}\" lang_code: \"${lang_code}\""
 
+# Ensure the po file exists and is writable
+touch ${locales_path}/${lang_code}.po
+
 # Generate new empty po file
 cd ${sources_path}
 find . -iname "*.js" | \
@@ -52,8 +55,7 @@ cd - >/dev/null
 
 # Merge old and new po files
 sed --in-place --expression=s/CHARSET/UTF-8/ ${sources_path}/tmp.po
-# Generate new empty po file
-touch ${locales_path}/${lang_code}.po
+
 msgmerge \
 	--no-wrap \
 	--lang=${lang_code} \
