@@ -52,6 +52,8 @@ cd - >/dev/null
 
 # Merge old and new po files
 sed --in-place --expression=s/CHARSET/UTF-8/ ${sources_path}/tmp.po
+# Generate new empty po file
+touch ${locales_path}/${lang_code}.po
 msgmerge \
 	--no-wrap \
 	--lang=${lang_code} \
