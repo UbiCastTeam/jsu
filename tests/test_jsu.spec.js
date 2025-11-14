@@ -244,4 +244,42 @@ describe('JSU', () => {
         jsu.useLang('x');
         assert(jsu.translate('lang') == 'en');
     });
+    it('should parse subtitles', () => {
+        const excepted = (srt) => JSON.stringify([
+            {
+                'id': 1,
+                'content': 'La première phrase.',
+                'timeStart': `00:00:47${srt ? ',' : '.'}250`,
+                'timeEnd': `00:00:50${srt ? ',' : '.'}500`
+            },
+            {
+                'id': 2,
+                'content': 'Une phrase avec des caratères spéciaux: !§.',
+                'timeStart': `00:00:51${srt ? ',' : '.'}800`,
+                'timeEnd': `00:00:55${srt ? ',' : '.'}800`
+            }
+        ]);
+        let result = JSON.stringify(jsu.parseSubtitle(`
+            1
+            00:00:47,250 --> 00:00:50,500
+            La première phrase.
+
+            2
+            00:00:51,800 --> 00:00:55,800
+            Une phrase avec des caratères spéciaux: !§.
+        `));
+        assert(result === excepted(true), `1) "${result}" not "${excepted(true)}"`);
+        result = JSON.stringify(jsu.parseSubtitle(`
+            WEBVTT - Test header
+
+            Comment line
+            00:00:47.250 --> 00:00:50.500
+            La première phrase.
+
+            2
+            00:00:51.800 --> 00:00:55.800
+            Une phrase avec des caratères spéciaux: !§.
+        `));
+        assert(result === excepted(), `2) "${result}" not ${excepted()}`);
+    });
 });

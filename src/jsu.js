@@ -689,13 +689,14 @@ export default class JavaScriptUtilities {
         // First split each block of content
         const rows = subtitle.replace(/\r/g, '').split('\n\n');
         const subContent = [];
+        let id = 1;
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
             // split block content
             const content = row.split('\n');
-            const id = i;
-            if (!content[0].includes(' --> ')) {
-                // content[0] should contain an id and not the time
+
+            while (content.length && !content[0].includes(' --> ')) {
+                // content[0] could contain an id or lines returns and not the time
                 // if it's the case we remove it
                 content.shift();
             }
@@ -712,9 +713,10 @@ export default class JavaScriptUtilities {
                     subContent.push({
                         'id': id,
                         'content': content.join(' ').trim(),
-                        'timeStart': times[0],
-                        'timeEnd': times[1]
+                        'timeStart': times[0].trim(),
+                        'timeEnd': times[1].trim()
                     });
+                    id += 1;
                 }
             }
         }
