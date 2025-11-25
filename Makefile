@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME ?= jsu-image
+DOCKER_IMAGE ?= jsu-image
 DOCKER_RUN ?= docker run \
 	--name jsu-container \
 	--workdir /apps \
@@ -7,25 +7,25 @@ DOCKER_RUN ?= docker run \
 	--rm -it
 
 docker_build:
-	docker build --tag ${DOCKER_IMAGE_NAME} .
+	docker build --tag ${DOCKER_IMAGE} .
 
 docker_rebuild:
-	docker build --no-cache -t ${DOCKER_IMAGE_NAME} .
+	docker build --no-cache -t ${DOCKER_IMAGE} .
 
 lint:
-	${DOCKER_RUN} ${DOCKER_IMAGE_NAME} make lint_local
+	${DOCKER_RUN} ${DOCKER_IMAGE} make lint_local
 
 lint_local:
 	npm run lint
 
 build:
-	${DOCKER_RUN} ${DOCKER_IMAGE_NAME} make build_local
+	${DOCKER_RUN} ${DOCKER_IMAGE} make build_local
 
 build_local:
 	npm run build
 
 test:
-	${DOCKER_RUN} --privileged ${DOCKER_IMAGE_NAME} make test_local
+	${DOCKER_RUN} --privileged ${DOCKER_IMAGE} make test_local
 
 test_local:
 	npm test
