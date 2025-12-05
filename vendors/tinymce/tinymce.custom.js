@@ -12,9 +12,9 @@ window.tinymceCustomInit = function (options) {
             'pre', 'code', 'blockquote', 'video', 'source'
         ];
         const ALLOWED_ATTRS = {
-            '*': ['class', 'style'],
-            'a': ['href', 'target', 'title'],
-            'img': ['alt', 'src', 'title'],
+            '*': ['class', 'style', 'title'],
+            'a': ['href', 'target'],
+            'img': ['alt', 'src'],
             'td': ['rowspan', 'colspan'],
             'th': ['rowspan', 'colspan'],
             'source': ['src', 'type'],
