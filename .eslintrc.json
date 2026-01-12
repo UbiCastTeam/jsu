@@ -1,7 +1,7 @@
 {
     "root": true,
     "extends": "eslint:recommended",
-    "ignorePatterns": ["*.min.js", "vendors/jquery", "dist*"],
+    "ignorePatterns": ["*.min.js", "vendors/", "dist/"],
     "rules": {
         "indent": ["error", 4, {"SwitchCase": 1, "ArrayExpression": "first", "ObjectExpression": "first"}],
         "no-trailing-spaces": "error",
