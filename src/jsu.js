@@ -727,7 +727,7 @@ export default class JavaScriptUtilities {
         const textRows = subContent.map((row) => {
             let text = row.content;
             if (text.endsWith('.') || text.endsWith('?') || text.endsWith('!')) {
-                text += '\n';
+                text += '\n\n';
             }
             return text;
         });
