@@ -3,7 +3,6 @@
   "version": "11",
   "description": "",
   "main": "gulpfile.js",
-  "type": "module",
   "scripts": {
     "test": "karma start",
     "build": "gulp build",

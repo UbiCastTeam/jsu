@@ -82,8 +82,8 @@ module.exports = (config) => {
             plugin: ['esmify']
         },
         coverageReporter: {
-            reporters:[
-                {type: 'lcov', dir:'coverage/', includeAllSources: true},
+            reporters: [
+                {type: 'lcov', dir: 'coverage/', includeAllSources: true},
                 {type: 'text', includeAllSources: true}
             ]
         }
