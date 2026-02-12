@@ -5,11 +5,7 @@ RUN apk upgrade --no-cache --available \
         make \
         chromium \
         chromium-swiftshader \
-        ttf-freefont \
-        font-noto-emoji \
-    && apk add --no-cache \
-        --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
-        font-wqy-zenhei
+        ttf-freefont
 
 ENV CHROME_BIN=/usr/bin/chromium-browser \
     CHROME_PATH=/usr/lib/chromium/
