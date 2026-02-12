@@ -4,6 +4,7 @@ RUN apk upgrade --no-cache --available \
     && apk add --no-cache \
         make \
         chromium \
+        chromium-swiftshader \
         ttf-freefont \
         font-noto-emoji \
     && apk add --no-cache \
