@@ -728,6 +728,8 @@ export default class JavaScriptUtilities {
             let text = row.content;
             if (text.endsWith('.') || text.endsWith('?') || text.endsWith('!')) {
                 text += '\n\n';
+            } else {
+                text += ' ';
             }
             return text;
         });
