@@ -146,6 +146,7 @@ export default class JavaScriptUtilities {
             progress: function (event) {},
             callback: function (xhr, response) {}, // response is decoded JSON if json else response text.
         } */
+        const obj = this;
         const params = args.params ? args.params : {};
         if (!args.cache) {
             params._ = (new Date()).getTime();
@@ -208,9 +209,10 @@ export default class JavaScriptUtilities {
                 xhr._callbackCalled = true;
                 let response;
                 if (args.json) {
+                    // The errors are displayed to users: the technical details go to "details"
                     if (this.responseText === '') {
                         response = {
-                            error: 'No response.',
+                            error: obj.translate('The server sent an empty response.'),
                             empty: true,
                             raw: this.responseText
                         };
@@ -219,7 +221,8 @@ export default class JavaScriptUtilities {
                             response = JSON.parse(this.responseText);
                         } catch (e) {
                             response = {
-                                error: 'Failed to parse json response: ' + e,
+                                error: obj.translate('The server response could not be read.'),
+                                details: 'Failed to parse json response: ' + e,
                                 raw: this.responseText
                             };
                         }
