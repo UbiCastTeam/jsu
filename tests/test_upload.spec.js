@@ -134,7 +134,7 @@ describe('ChunkedUpload', () => {
             return success === null;
         }, 100);
         assert(success === false);
-        assert(msg.indexOf('Failed to parse json response:') === 0);
+        assert(msg === 'The server response could not be read.');
         assert(progress === 95);
         assert(retries === 2);
     });
@@ -174,7 +174,7 @@ describe('ChunkedUpload', () => {
             return success === null;
         }, 100);
         assert(success === false);
-        assert(msg.indexOf('Failed to parse json response:') === 0);
+        assert(msg === 'The server response could not be read.');
         assert(progress === 95);
         assert(retries === 2);
     });
