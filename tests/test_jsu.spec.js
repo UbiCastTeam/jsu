@@ -282,4 +282,48 @@ describe('JSU', () => {
         `));
         assert(result === excepted(), `2) "${result}" not ${excepted()}`);
     });
+    it('should parse webvtt subtitles with every feature', () => {
+        const vtt = [
+            'WEBVTT - Header',
+            '',
+            'NOTE',
+            'A comment.',
+            '',
+            'STYLE',
+            '::cue { color: red }',
+            '',
+            'REGION',
+            'id:topleft',
+            'width:40%',
+            '',
+            'region-and-voice',
+            '00:00:00.500 --> 00:00:03.000 region:topleft',
+            '<v Narrator>Region top left</v>',
+            '<v Other>Voice tags</v>',
+            '',
+            'NOTE A comment between cues',
+            '',
+            '00:00:03.000 --> 00:00:05.500 line:10% align:start position:10%,line-left size:50%',
+            '<b>bold</b>, <i>italic</i>, <b.loud>class</b> <c.white.bg_black>colour</c>',
+            'Entities: &amp; &lt; &gt; &quot; &#233;&#xe9; &unknown;',
+            '',
+            '00:05.500 --> 00:08.000',
+            'Karaoke: <00:00:06.000>one <00:00:06.500>two <lang ja><ruby>漢字<rt>kanji</rt></ruby></lang>',
+            '',
+            '00:00:08.000 --> 00:00:10.500',
+            '<font color="red">font</font> <img src=x onerror="window.jsuInjected = true"> <i>unclosed <b>tags',
+            ''
+        ].join('\n');
+        const result = jsu.parseSubtitle(vtt);
+        assert.deepStrictEqual(result, [
+            {id: 1, content: 'Region top left Voice tags', timeStart: '00:00:00.500', timeEnd: '00:00:03.000'},
+            {id: 2, content: 'bold, italic, class colour Entities: & < > " éé &unknown;', timeStart: '00:00:03.000', timeEnd: '00:00:05.500'},
+            {id: 3, content: 'Karaoke: one two 漢字', timeStart: '00:05.500', timeEnd: '00:08.000'},
+            {id: 4, content: 'font unclosed tags', timeStart: '00:00:08.000', timeEnd: '00:00:10.500'}
+        ]);
+        assert(window.jsuInjected === undefined);
+        assert.strictEqual(
+            jsu.subtitleToText(vtt),
+            'Region top left Voice tags bold, italic, class colour Entities: & < > " éé &unknown; Karaoke: one two 漢字 font unclosed tags ');
+    });
 });

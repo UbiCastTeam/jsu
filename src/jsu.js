@@ -713,17 +713,26 @@ export default class JavaScriptUtilities {
                 if (times.length == 2) {
                     // if we extracted the correct start and end time
                     // we store everything in an object
+                    // (the webvtt cue settings after the end time are dropped)
                     subContent.push({
                         'id': id,
-                        'content': content.join(' ').trim(),
+                        'content': this.subtitleCueToText(content.join(' ')),
                         'timeStart': times[0].trim(),
-                        'timeEnd': times[1].trim()
+                        'timeEnd': times[1].trim().split(/[ \t]/)[0]
                     });
                     id += 1;
                 }
             }
         }
         return subContent;
+    }
+    subtitleCueToText (text) {
+        // Get the text of a webvtt cue: without the ruby annotations nor the tags (styles, voices,
+        // karaoke timestamps, ...), and with the decoded entities. The content of a textarea is
+        // not parsed as HTML, so the entities are decoded without creating any element.
+        const textarea = document.createElement('textarea');
+        textarea.innerHTML = text.replace(/<rt(\.[^>]*)?>[\s\S]*?(<\/rt>|(?=<\/ruby>)|$)/g, '').replace(/<[^>]*>/g, '');
+        return textarea.value.replace(/[ \t]+/g, ' ').trim();
     }
     subtitleToText (text) {
         const subContent = this.parseSubtitle(text);
